@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -21,12 +23,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { upcomingEvents } from '@/lib/data';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AllEventsPage() {
+  const { toast } = useToast();
+
+  const handleDelete = (eventName: string) => {
+    toast({
+      title: 'Event Deleted',
+      description: `${eventName} has been successfully deleted.`,
+    });
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -46,92 +69,122 @@ export default function AllEventsPage() {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {upcomingEvents.map((event) => (
-          <Card key={event.name} className="overflow-hidden flex flex-col group">
-            <CardHeader className="p-0 relative">
-              <Image
-                src={
-                  event.imageUrl ||
-                  'https://picsum.photos/seed/placeholder/600/400'
-                }
-                alt={event.name}
-                width={600}
-                height={400}
-                className="w-full h-48 object-cover transform transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint="event photo"
-              />
-              <Badge
-                className="absolute top-2 right-2"
-                variant={
-                  new Date(event.date).getTime() > new Date().getTime()
-                    ? 'default'
-                    : 'secondary'
-                }
-              >
-                {new Date(event.date).getTime() > new Date().getTime()
-                  ? 'Upcoming'
-                  : 'Past'}
-              </Badge>
-            </CardHeader>
-            <CardContent className="p-4 flex-grow">
-              <CardTitle className="text-lg mb-2 leading-tight h-12">
-                {event.name}
-              </CardTitle>
-              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <CalendarIcon className="h-4 w-4 flex-shrink-0" />
-                  <span>
-                    {new Date(event.date).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">{event.location}</span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex-col items-start gap-3 p-4 pt-0">
-              <div className="w-full">
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>
-                    {event.ticketsSold.toLocaleString()} /{' '}
-                    {event.totalTickets.toLocaleString()} sold
-                  </span>
-                  <span>
-                    {((event.ticketsSold / event.totalTickets) * 100).toFixed(0)}%
-                  </span>
-                </div>
-                <Progress
-                  value={(event.ticketsSold / event.totalTickets) * 100}
-                  className="h-2"
+          <AlertDialog key={event.name}>
+            <Card className="overflow-hidden flex flex-col group">
+              <CardHeader className="p-0 relative">
+                <Image
+                  src={
+                    event.imageUrl ||
+                    'https://picsum.photos/seed/placeholder/600/400'
+                  }
+                  alt={event.name}
+                  width={600}
+                  height={400}
+                  className="w-full h-48 object-cover transform transition-transform duration-300 group-hover:scale-105"
+                  data-ai-hint="event photo"
                 />
-              </div>
+                <Badge
+                  className="absolute top-2 right-2"
+                  variant={
+                    new Date(event.date).getTime() > new Date().getTime()
+                      ? 'default'
+                      : 'secondary'
+                  }
+                >
+                  {new Date(event.date).getTime() > new Date().getTime()
+                    ? 'Upcoming'
+                    : 'Past'}
+                </Badge>
+              </CardHeader>
+              <CardContent className="p-4 flex-grow">
+                <CardTitle className="text-lg mb-2 leading-tight h-12">
+                  {event.name}
+                </CardTitle>
+                <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon className="h-4 w-4 flex-shrink-0" />
+                    <span>
+                      {new Date(event.date).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">{event.location}</span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex-col items-start gap-3 p-4 pt-0">
+                <div className="w-full">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                    <span>
+                      {event.ticketsSold.toLocaleString()} /{' '}
+                      {event.totalTickets.toLocaleString()} sold
+                    </span>
+                    <span>
+                      {(
+                        (event.ticketsSold / event.totalTickets) *
+                        100
+                      ).toFixed(0)}
+                      %
+                    </span>
+                  </div>
+                  <Progress
+                    value={(event.ticketsSold / event.totalTickets) * 100}
+                    className="h-2"
+                  />
+                </div>
 
-              <div className="flex w-full items-center justify-end -mb-2 -mr-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button aria-haspopup="true" size="icon" variant="ghost">
-                      <MoreVertical className="h-4 w-4" />
-                      <span className="sr-only">Toggle menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem>Clone</DropdownMenuItem>
-                    <DropdownMenuItem>View Analytics</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive">
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardFooter>
-          </Card>
+                <div className="flex w-full items-center justify-end -mb-2 -mr-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button aria-haspopup="true" size="icon" variant="ghost">
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Toggle menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link href="/events/create">Edit</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/events/clone">Clone</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/events/analytics">View Analytics</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem className="text-destructive cursor-pointer">
+                          Delete
+                        </DropdownMenuItem>
+                      </AlertDialogTrigger>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </CardFooter>
+            </Card>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  event &quot;{event.name}&quot; and remove its data from our
+                  servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDelete(event.name)}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         ))}
       </div>
     </div>

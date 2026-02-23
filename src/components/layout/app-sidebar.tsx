@@ -29,6 +29,7 @@ import {
   Ticket,
   ChevronRight,
   Users,
+  LineChart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '../ui/separator';
@@ -56,8 +57,10 @@ const navItems: (
     label: 'Events',
     subItems: [
       { href: '/events/edit', label: 'All Events' },
+      { href: '/events/create', label: 'Create Event' },
       { href: '/events/clone', label: 'Clone Event' },
       { href: '/events/drafts', label: 'Draft Events' },
+      { href: '/events/analytics', label: 'Analytics' },
     ],
   },
   {
