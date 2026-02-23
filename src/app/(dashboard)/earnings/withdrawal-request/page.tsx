@@ -213,7 +213,7 @@ export default function WithdrawalRequestPage() {
                           </FormControl>
                           <Label
                             htmlFor="bank"
-                            className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 [&:has([data-state=checked])]:text-primary"
+                            className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-primary/5 hover:border-primary/20 hover:text-primary [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10 [&:has([data-state=checked])]:text-primary"
                           >
                             <Landmark className="mb-3 h-6 w-6" />
                             Bank Transfer
@@ -229,7 +229,7 @@ export default function WithdrawalRequestPage() {
                           </FormControl>
                           <Label
                             htmlFor="mobile"
-                            className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 [&:has([data-state=checked])]:text-primary"
+                            className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-primary/5 hover:border-primary/20 hover:text-primary [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10 [&:has([data-state=checked])]:text-primary"
                           >
                             <Smartphone className="mb-3 h-6 w-6" />
                             Mobile Banking
