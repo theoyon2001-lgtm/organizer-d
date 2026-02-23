@@ -20,19 +20,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Download,
-  MoreHorizontal,
+  FileText,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { payoutHistory as initialPayoutHistory } from '@/lib/data';
 import { Payout } from '@/lib/types';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -135,25 +128,16 @@ export default function PayoutHistoryPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>
-                              Download Receipt
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="icon">
+                            <FileText className="h-4 w-4" />
+                            <span className="sr-only">View Details</span>
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Download className="h-4 w-4" />
+                            <span className="sr-only">Download Receipt</span>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
