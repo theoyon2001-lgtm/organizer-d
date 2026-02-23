@@ -168,7 +168,7 @@ export default function WithdrawalRequestPage() {
                   <FormItem>
                     <FormLabel>Amount to Withdraw ($)</FormLabel>
                     <div className="relative">
-                      <Wallet className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Wallet className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
                       <FormControl>
                         <Input
                           type="number"
@@ -213,7 +213,7 @@ export default function WithdrawalRequestPage() {
                           </FormControl>
                           <Label
                             htmlFor="bank"
-                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
+                            className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 [&:has([data-state=checked])]:text-primary"
                           >
                             <Landmark className="mb-3 h-6 w-6" />
                             Bank Transfer
@@ -229,7 +229,7 @@ export default function WithdrawalRequestPage() {
                           </FormControl>
                           <Label
                             htmlFor="mobile"
-                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
+                            className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 [&:has([data-state=checked])]:text-primary"
                           >
                             <Smartphone className="mb-3 h-6 w-6" />
                             Mobile Banking
@@ -243,7 +243,7 @@ export default function WithdrawalRequestPage() {
               />
 
               {watchedMethod === 'bank' && (
-                <Card className="bg-muted/30">
+                <Card className="border-primary/20 bg-primary/5">
                   <CardHeader>
                     <CardTitle className="text-lg">
                       Bank Account Details
@@ -297,7 +297,7 @@ export default function WithdrawalRequestPage() {
               )}
 
               {watchedMethod === 'mobile' && (
-                <Card className="bg-muted/30">
+                <Card className="border-primary/20 bg-primary/5">
                   <CardHeader>
                     <CardTitle className="text-lg">
                       Mobile Banking Details
