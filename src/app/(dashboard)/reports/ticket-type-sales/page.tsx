@@ -19,11 +19,10 @@ import {
 import { Button } from '@/components/ui/button';
 import {
   Download,
-  Ticket,
-  BarChart3,
-  TicketPercent,
-  DollarSign,
   Users,
+  CalendarCheck,
+  Filter,
+  TicketPercent,
 } from 'lucide-react';
 import {
   Select,
@@ -37,117 +36,51 @@ import {
   upcomingEvents,
   ticketPurchases,
 } from '@/lib/data';
-import { TicketTypeSale } from '@/lib/types';
-import SalesByTypeChart from './sales-by-type-chart';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-
-const COLORS = [
-  'hsl(var(--chart-1))',
-  'hsl(var(--chart-2))',
-  'hsl(var(--chart-3))',
-  'hsl(var(--chart-4))',
-  'hsl(var(--chart-5))',
-];
 
 export default function TicketTypeSalesPage() {
   const { toast } = useToast();
   const [selectedEvent, setSelectedEvent] = React.useState('all');
+  const [selectedTicketType, setSelectedTicketType] = React.useState('all');
 
-  const filteredSales = React.useMemo(() => {
-    if (selectedEvent === 'all') {
-      return ticketTypeSalesData;
-    }
-    return ticketTypeSalesData.filter((sale) => sale.event === selectedEvent);
+  // When event filter changes, reset ticket type filter
+  React.useEffect(() => {
+    setSelectedTicketType('all');
   }, [selectedEvent]);
 
-  const stats = React.useMemo(() => {
-    const totalRevenue = filteredSales.reduce(
-      (sum, sale) => sum + sale.revenue,
-      0
-    );
-    const totalTicketsSold = filteredSales.reduce(
-      (sum, sale) => sum + sale.ticketsSold,
-      0
-    );
-    const uniqueTicketTypes = new Set(filteredSales.map((sale) => sale.ticketType))
-      .size;
-    return { totalRevenue, totalTicketsSold, uniqueTicketTypes };
-  }, [filteredSales]);
-
-  const chartData = React.useMemo(() => {
-    const dataByTicketType = filteredSales.reduce(
-      (acc, sale) => {
-        if (!acc[sale.ticketType]) {
-          acc[sale.ticketType] = { revenue: 0, ticketType: sale.ticketType };
-        }
-        acc[sale.ticketType].revenue += sale.revenue;
-        return acc;
-      },
-      {} as { [key: string]: { revenue: number; ticketType: string } }
-    );
-
-    return Object.values(dataByTicketType)
-      .sort((a, b) => b.revenue - a.revenue)
-      .map((item, index) => ({
-        ...item,
-        fill: COLORS[index % COLORS.length],
-      }));
-  }, [filteredSales]);
-
-  const handleSalesExport = () => {
-    if (filteredSales.length === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'No data to export',
-        description: 'There is no data to export for the selected filter.',
-      });
-      return;
+  const availableTicketTypes = React.useMemo(() => {
+    if (selectedEvent === 'all') {
+      return [];
     }
+    const types = ticketTypeSalesData
+      .filter((sale) => sale.event === selectedEvent)
+      .map((sale) => sale.ticketType);
+    return [...new Set(types)];
+  }, [selectedEvent]);
 
-    const headers = [
-      'Event',
-      'Ticket Type',
-      'Price',
-      'Tickets Sold',
-      'Revenue',
-    ];
-    const csvRows = filteredSales.map((sale) =>
-      [
-        `"${sale.event}"`,
-        `"${sale.ticketType}"`,
-        sale.price,
-        sale.ticketsSold,
-        `"${sale.revenue.toFixed(2)}"`,
-      ].join(',')
-    );
-
-    const csvContent = [headers.join(','), ...csvRows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'ticket-type-sales.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: 'Export Successful',
-      description: 'Your ticket type sales report has been downloaded.',
+  const filteredCustomers = React.useMemo(() => {
+    return ticketPurchases.filter((purchase) => {
+      const eventMatch =
+        selectedEvent === 'all' || purchase.event === selectedEvent;
+      const ticketTypeMatch =
+        selectedTicketType === 'all' ||
+        purchase.ticketType === selectedTicketType;
+      return eventMatch && ticketTypeMatch;
     });
-  };
+  }, [selectedEvent, selectedTicketType]);
+
+  const stats = React.useMemo(() => {
+    const totalCustomers = filteredCustomers.length;
+    const uniqueEvents = new Set(filteredCustomers.map((c) => c.event)).size;
+    const uniqueTicketTypes = new Set(
+      filteredCustomers.map((c) => c.ticketType)
+    ).size;
+    return { totalCustomers, uniqueEvents, uniqueTicketTypes };
+  }, [filteredCustomers]);
 
   const handleCustomerExport = () => {
-    const customersToExport =
-      selectedEvent === 'all'
-        ? ticketPurchases
-        : ticketPurchases.filter(
-            (purchase) => purchase.event === selectedEvent
-          );
-
-    if (customersToExport.length === 0) {
+    if (filteredCustomers.length === 0) {
       toast({
         variant: 'destructive',
         title: 'No customer data to export',
@@ -163,7 +96,7 @@ export default function TicketTypeSalesPage() {
       'Ticket Type',
       'Purchase Date',
     ];
-    const csvRows = customersToExport.map((p) =>
+    const csvRows = filteredCustomers.map((p) =>
       [
         `"${p.customerName}"`,
         `"${p.customerEmail}"`,
@@ -197,39 +130,14 @@ export default function TicketTypeSalesPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Ticket Type Sales
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Customer Data</h1>
           <p className="text-muted-foreground">
-            A breakdown of sales by individual ticket types.
+            Filter and export customer lists by event and ticket type.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-            <SelectTrigger
-              className={cn(
-                'w-[280px]',
-                selectedEvent !== 'all' &&
-                  'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 font-medium'
-              )}
-            >
-              <SelectValue placeholder="Filter by event" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Events</SelectItem>
-              {upcomingEvents.map((event) => (
-                <SelectItem key={event.id} value={event.name}>
-                  {event.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={handleSalesExport}>
-            <Download className="mr-2 h-4 w-4" />
-            Export Sales
-          </Button>
           <Button variant="outline" onClick={handleCustomerExport}>
-            <Users className="mr-2 h-4 w-4" />
+            <Download className="mr-2 h-4 w-4" />
             Export Customers
           </Button>
         </div>
@@ -238,32 +146,31 @@ export default function TicketTypeSalesPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">
+              Total Customers
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              $
-              {stats.totalRevenue.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-              })}
+              {stats.totalCustomers.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">From selected sales</p>
+            <p className="text-xs text-muted-foreground">
+              Matching current filter
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Tickets Sold
-            </CardTitle>
-            <Ticket className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Events</CardTitle>
+            <CalendarCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats.totalTicketsSold.toLocaleString()}
+              {stats.uniqueEvents.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              Across all ticket types
+              Represented in selection
             </p>
           </CardContent>
         </Card>
@@ -274,90 +181,103 @@ export default function TicketTypeSalesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.uniqueTicketTypes}</div>
-            <p className="text-xs text-muted-foreground">In selected events</p>
+            <p className="text-xs text-muted-foreground">In current selection</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Detailed Sales by Ticket Type</CardTitle>
-            <CardDescription>
-              A comprehensive list of sales per ticket type for the selected
-              event(s).
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle>Customer List</CardTitle>
+          <CardDescription>
+            A detailed list of customers who purchased tickets. Use the filters
+            below to refine your search.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6 flex flex-wrap items-center gap-4 rounded-lg bg-muted/50 p-4">
+            <div className="flex items-center gap-2 font-semibold text-muted-foreground">
+              <Filter className="h-5 w-5" />
+              <span>Filters:</span>
+            </div>
+            <Select value={selectedEvent} onValueChange={setSelectedEvent}>
+              <SelectTrigger
+                className={cn(
+                  'w-full sm:w-[280px]',
+                  selectedEvent !== 'all' &&
+                    'border-primary/30 bg-primary/5 font-medium text-primary hover:bg-primary/10'
+                )}
+              >
+                <SelectValue placeholder="Filter by event" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Events</SelectItem>
+                {upcomingEvents.map((event) => (
+                  <SelectItem key={event.id} value={event.name}>
+                    {event.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={selectedTicketType}
+              onValueChange={setSelectedTicketType}
+              disabled={selectedEvent === 'all'}
+            >
+              <SelectTrigger className="w-full sm:w-[280px]">
+                <SelectValue placeholder="Filter by ticket type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Ticket Types</SelectItem>
+                {availableTicketTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Customer Name</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead>Event</TableHead>
                   <TableHead>Ticket Type</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="text-right">Sold</TableHead>
-                  <TableHead className="text-right">Revenue</TableHead>
+                  <TableHead className="text-right">Purchase Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredSales.length > 0 ? (
-                  filteredSales.map((sale, index) => (
-                    <TableRow
-                      key={`${sale.event}-${sale.ticketType}-${index}`}
-                    >
-                      <TableCell className="font-medium">{sale.event}</TableCell>
-                      <TableCell>{sale.ticketType}</TableCell>
-                      <TableCell className="text-right">
-                        ${sale.price.toFixed(2)}
+                {filteredCustomers.length > 0 ? (
+                  filteredCustomers.map((purchase) => (
+                    <TableRow key={purchase.purchaseId}>
+                      <TableCell className="font-medium">
+                        {purchase.customerName}
                       </TableCell>
+                      <TableCell>{purchase.customerEmail}</TableCell>
+                      <TableCell>{purchase.event}</TableCell>
+                      <TableCell>{purchase.ticketType}</TableCell>
                       <TableCell className="text-right">
-                        {sale.ticketsSold.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        $
-                        {sale.revenue.toLocaleString('en-US', {
-                          minimumFractionDigits: 2,
-                        })}
+                        {purchase.purchaseDate}
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
-                      No sales data available for this filter.
+                    <TableCell
+                      colSpan={5}
+                      className="h-24 text-center"
+                    >
+                      No customers found for the selected filters.
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Revenue by Ticket Type</CardTitle>
-            <CardDescription>
-              A visual breakdown of revenue contributions from each ticket
-              type.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {chartData.length > 0 ? (
-              <SalesByTypeChart data={chartData} />
-            ) : (
-              <div className="flex h-[300px] flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/20">
-                <BarChart3 className="h-16 w-16 text-muted-foreground/50 mb-4" />
-                <h3 className="text-xl font-semibold text-muted-foreground">
-                  No Chart Data
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Select an event with sales to see the chart.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
