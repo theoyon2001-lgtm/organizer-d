@@ -28,6 +28,7 @@ import {
   Settings,
   Ticket,
   ChevronRight,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '../ui/separator';
@@ -91,6 +92,18 @@ const navItems: (
       { href: '/reports/daily-sales', label: 'Daily Sales' },
       { href: '/reports/ticket-type-sales', label: 'Ticket Type Sales' },
       { href: '/reports/attendance-report', label: 'Attendance Report' },
+    ],
+  },
+  {
+    href: '/customer-database',
+    icon: Users,
+    label: 'Customer Database',
+    subItems: [
+      { href: '/customer-database/all-customers', label: 'All Customers' },
+      { href: '/customer-database/segmentation', label: 'Segmentation' },
+      { href: '/customer-database/bulk-actions', label: 'Bulk Actions' },
+      { href: '/customer-database/customer-logs', label: 'Customer Logs' },
+      { href: '/customer-database/backup-restore', label: 'Backup & Restore' },
     ],
   },
 ];
