@@ -8,6 +8,7 @@ import type {
   CommissionChartData,
   DailySale,
   TicketTypeSale,
+  TicketPurchase,
 } from './types';
 
 // Add a seeded random generator to ensure consistent data between server and client
@@ -246,4 +247,18 @@ export const ticketTypeSalesData: TicketTypeSale[] = [
   { event: 'Marathon of Hope', ticketType: 'Runner Registration', ticketsSold: 8000, price: 50, revenue: 400000 },
   { event: 'Oktoberfest Celebration', ticketType: 'Beer Stein Package', ticketsSold: 2500, price: 30, revenue: 75000 },
   { event: 'Oktoberfest Celebration', ticketType: 'General Entry', ticketsSold: 500, price: 15, revenue: 7500 },
+];
+
+export const ticketPurchases: TicketPurchase[] = [
+  { purchaseId: 'tp-001', customerName: 'Alice Johnson', customerEmail: 'alice@example.com', event: 'Summer Music Festival', ticketType: 'General Admission', purchaseDate: '2024-07-01' },
+  { purchaseId: 'tp-002', customerName: 'Bob Williams', customerEmail: 'bob@example.com', event: 'Summer Music Festival', ticketType: 'General Admission', purchaseDate: '2024-07-02' },
+  { purchaseId: 'tp-003', customerName: 'Charlie Brown', customerEmail: 'charlie@example.com', event: 'Summer Music Festival', ticketType: 'VIP', purchaseDate: '2024-07-03' },
+  { purchaseId: 'tp-004', customerName: 'Diana Prince', customerEmail: 'diana@example.com', event: 'Tech Conference 2024', ticketType: 'Standard Pass', purchaseDate: '2024-07-04' },
+  { purchaseId: 'tp-005', customerName: 'Ethan Hunt', customerEmail: 'ethan@example.com', event: 'Tech Conference 2024', ticketType: 'Standard Pass', purchaseDate: '2024-07-05' },
+  { purchaseId: 'tp-006', customerName: 'Fiona Glenanne', customerEmail: 'fiona@example.com', event: 'Tech Conference 2024', ticketType: 'Workshop Add-on', purchaseDate: '2024-07-05' },
+  { purchaseId: 'tp-007', customerName: 'George Costanza', customerEmail: 'george@example.com', event: 'Art & Wine Fair', ticketType: 'Tasting Ticket', purchaseDate: '2024-07-06' },
+  { purchaseId: 'tp-008', customerName: 'Hannah Montana', customerEmail: 'hannah@example.com', event: 'Winter Wonderfest', ticketType: 'Adult', purchaseDate: '2024-01-10' },
+  { purchaseId: 'tp-009', customerName: 'Indiana Jones', customerEmail: 'indy@example.com', event: 'Spring Bloom Festival', ticketType: 'Any-Day Pass', purchaseDate: '2024-03-20' },
+  { purchaseId: 'tp-010', customerName: 'Jack Sparrow', customerEmail: 'jack@example.com', event: 'Indie Film Showcase', ticketType: 'All-Day Pass', purchaseDate: '2024-06-01' },
+  { purchaseId: 'tp-011', customerName: 'Kevin McCallister', customerEmail: 'kevin@example.com', event: 'Oktoberfest Celebration', ticketType: 'Beer Stein Package', purchaseDate: '2024-10-05' },
 ];

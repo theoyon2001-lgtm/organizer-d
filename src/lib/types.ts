@@ -64,3 +64,12 @@ export type TicketTypeSale = {
   price: number;
   revenue: number;
 };
+
+export type TicketPurchase = {
+  purchaseId: string;
+  customerName: string;
+  customerEmail: string;
+  event: string;
+  ticketType: string;
+  purchaseDate: string;
+};
