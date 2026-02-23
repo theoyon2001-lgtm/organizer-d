@@ -62,7 +62,17 @@ const navItems: (
     ],
   },
   { href: '/seats', icon: Armchair, label: 'Seat Management' },
-  { href: '/orders', icon: ShoppingCart, label: 'Orders' },
+  {
+    href: '/orders',
+    icon: ShoppingCart,
+    label: 'Orders',
+    subItems: [
+      { href: '/orders/all', label: 'All Orders' },
+      { href: '/orders/refund-requests', label: 'Refund Requests' },
+      { href: '/orders/attendee-list', label: 'Attendee List' },
+      { href: '/orders/export-csv', label: 'Export CSV' },
+    ],
+  },
   { href: '/earnings', icon: DollarSign, label: 'Earnings' },
   { href: '/promotions', icon: TicketPercent, label: 'Promotions' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
