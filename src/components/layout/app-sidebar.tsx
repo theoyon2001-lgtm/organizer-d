@@ -2,6 +2,11 @@
 
 import { usePathname } from 'next/navigation';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
   Sidebar,
   SidebarHeader,
   SidebarContent,
@@ -9,6 +14,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -20,14 +28,39 @@ import {
   BarChart3,
   Settings,
   Ticket,
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
+import React from 'react';
 
-const navItems = [
+const navItems: (
+  | {
+      href: string;
+      icon: React.ElementType;
+      label: string;
+      subItems?: undefined;
+    }
+  | {
+      href: string;
+      icon: React.ElementType;
+      label: string;
+      subItems: { href: string; label: string }[];
+    }
+)[] = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/events', icon: Calendar, label: 'Events' },
+  {
+    href: '/events',
+    icon: Calendar,
+    label: 'Events',
+    subItems: [
+      { href: '/events/create', label: 'Create Event' },
+      { href: '/events/edit', label: 'Edit Event' },
+      { href: '/events/clone', label: 'Clone Event' },
+      { href: '/events/drafts', label: 'Draft Events' },
+    ],
+  },
   { href: '/seats', icon: Armchair, label: 'Seat Management' },
   { href: '/orders', icon: ShoppingCart, label: 'Orders' },
   { href: '/earnings', icon: DollarSign, label: 'Earnings' },
@@ -56,20 +89,52 @@ export default function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {navItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname.startsWith(item.href)}
-                tooltip={{ children: item.label, side: 'right' }}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {navItems.map((item) =>
+            item.subItems ? (
+              <Collapsible key={item.href} asChild>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      isActive={pathname.startsWith(item.href)}
+                      tooltip={{ children: item.label, side: 'right' }}
+                      className="group w-full"
+                    >
+                      <item.icon />
+                      <span>{item.label}</span>
+                      <ChevronRight className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.subItems.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.href}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={pathname === subItem.href}
+                          >
+                            <Link href={subItem.href}>{subItem.label}</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+            ) : (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith(item.href)}
+                  tooltip={{ children: item.label, side: 'right' }}
+                >
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          )}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
