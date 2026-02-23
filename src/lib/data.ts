@@ -2,6 +2,7 @@ import type { Event, Sale } from './types';
 
 export const upcomingEvents: Event[] = [
   {
+    id: 'winter-wonderfest',
     name: 'Winter Wonderfest',
     date: '2024-01-20',
     location: 'Millennium Park, Chicago',
@@ -11,6 +12,7 @@ export const upcomingEvents: Event[] = [
     price: 45,
   },
   {
+    id: 'spring-bloom-festival',
     name: 'Spring Bloom Festival',
     date: '2024-04-05',
     location: 'Brooklyn Botanic Garden, New York',
@@ -20,6 +22,7 @@ export const upcomingEvents: Event[] = [
     price: 60,
   },
   {
+    id: 'indie-film-showcase',
     name: 'Indie Film Showcase',
     date: '2024-06-12',
     location: 'TCL Chinese Theatre, Hollywood',
@@ -29,6 +32,7 @@ export const upcomingEvents: Event[] = [
     price: 25,
   },
   {
+    id: 'summer-music-festival',
     name: 'Summer Music Festival',
     date: '2024-08-15',
     location: 'Central Park, New York',
@@ -38,6 +42,7 @@ export const upcomingEvents: Event[] = [
     price: 75,
   },
   {
+    id: 'tech-conference-2024',
     name: 'Tech Conference 2024',
     date: '2024-09-10',
     location: 'Moscone Center, San Francisco',
@@ -47,6 +52,7 @@ export const upcomingEvents: Event[] = [
     price: 499,
   },
   {
+    id: 'art-wine-fair',
     name: 'Art & Wine Fair',
     date: '2024-09-22',
     location: 'Napa Valley, California',
@@ -56,6 +62,7 @@ export const upcomingEvents: Event[] = [
     price: 120,
   },
   {
+    id: 'marathon-of-hope',
     name: 'Marathon of Hope',
     date: '2024-10-05',
     location: 'City Waterfront',
@@ -65,6 +72,7 @@ export const upcomingEvents: Event[] = [
     price: 50,
   },
   {
+    id: 'oktoberfest-celebration',
     name: 'Oktoberfest Celebration',
     date: '2024-10-15',
     location: 'Old World Village, Huntington Beach',
@@ -77,6 +85,7 @@ export const upcomingEvents: Event[] = [
 
 export const draftEvents: Event[] = [
   {
+    id: 'untitled-charity-run',
     name: 'Untitled Charity Run',
     date: '2024-11-15',
     location: 'Venue TBD',
@@ -85,6 +94,7 @@ export const draftEvents: Event[] = [
     imageUrl: 'https://picsum.photos/seed/draft1/600/400',
   },
   {
+    id: 'annual-tech-summit',
     name: 'Annual Tech Summit',
     date: '2024-12-01',
     location: 'Convention Center',

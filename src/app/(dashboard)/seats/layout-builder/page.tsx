@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Card,
   CardContent,
@@ -18,23 +16,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { upcomingEvents } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 export default function SeatLayoutBuilderPage() {
-  const { toast } = useToast();
-
   // For demonstration, we'll assume some events have layouts and some don't
   const eventsWithLayoutStatus = upcomingEvents.map((event, index) => ({
     ...event,
     hasLayout: index % 2 === 0, // Mock data: every other event has a layout
   }));
-
-  const handleManageLayoutClick = (eventName: string) => {
-    toast({
-      title: 'Coming Soon!',
-      description: `The interactive seat layout builder for "${eventName}" is under construction.`,
-    });
-  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -66,7 +55,7 @@ export default function SeatLayoutBuilderPage() {
             </TableHeader>
             <TableBody>
               {eventsWithLayoutStatus.map((event) => (
-                <TableRow key={event.name}>
+                <TableRow key={event.id}>
                   <TableCell className="font-medium">{event.name}</TableCell>
                   <TableCell>
                     {new Date(event.date).toLocaleDateString('en-US', {
@@ -83,11 +72,10 @@ export default function SeatLayoutBuilderPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="outline"
-                      onClick={() => handleManageLayoutClick(event.name)}
-                    >
-                      {event.hasLayout ? 'Edit Layout' : 'Create Layout'}
+                    <Button variant="outline" asChild>
+                      <Link href={`/seats/layout-builder/${event.id}`}>
+                        {event.hasLayout ? 'Edit Layout' : 'Create Layout'}
+                      </Link>
                     </Button>
                   </TableCell>
                 </TableRow>
