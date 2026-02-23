@@ -14,10 +14,11 @@ import {
   Ticket,
   Calendar as CalendarIcon,
   Percent,
+  BarChart3,
 } from 'lucide-react';
 import { upcomingEvents } from '@/lib/data';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { DateRange } from 'react-day-picker';
+import type { DateRange } from 'react-day-picker';
 import { format, subDays } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -109,7 +110,7 @@ export default function AnalyticsPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Event Analytics</h1>
@@ -171,7 +172,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Tickets Sold
@@ -182,10 +183,10 @@ export default function AnalyticsPage() {
             <div className="text-2xl font-bold">
               {analyticsData.totalTicketsSold.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">In selected period</p>
+            <p className="text-xs text-muted-foreground">This period</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -198,11 +199,11 @@ export default function AnalyticsPage() {
               })}
             </div>
             <p className="text-xs text-muted-foreground">
-              Estimated from ticket sales
+              From sales
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Upcoming Events
@@ -213,10 +214,10 @@ export default function AnalyticsPage() {
             <div className="text-2xl font-bold">
               {analyticsData.activeEvents}
             </div>
-            <p className="text-xs text-muted-foreground">In selected period</p>
+            <p className="text-xs text-muted-foreground">This period</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-md hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Avg. Sell-through Rate
@@ -228,13 +229,13 @@ export default function AnalyticsPage() {
               {analyticsData.averageSellThrough.toFixed(1)}%
             </div>
             <p className="text-xs text-muted-foreground">
-              Tickets sold vs. available
+              Sell-through
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="shadow-md hover:shadow-lg transition-shadow">
         <CardHeader>
           <CardTitle>Ticket Sales by Event</CardTitle>
           <CardDescription>
@@ -289,9 +290,11 @@ export default function AnalyticsPage() {
               </BarChart>
             </ChartContainer>
           ) : (
-            <div className="flex h-[400px] items-center justify-center rounded-lg border-2 border-dashed">
-              <p className="text-muted-foreground">
-                No event data for the selected period.
+            <div className="flex h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/20">
+              <BarChart3 className="h-16 w-16 text-muted-foreground/50 mb-4" />
+              <h3 className="text-xl font-semibold text-muted-foreground">No Data to Display</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Try selecting a different date range.
               </p>
             </div>
           )}
