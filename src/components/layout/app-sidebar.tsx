@@ -61,7 +61,17 @@ const navItems: (
       { href: '/events/drafts', label: 'Draft Events' },
     ],
   },
-  { href: '/seats', icon: Armchair, label: 'Seat Management' },
+  {
+    href: '/seats',
+    icon: Armchair,
+    label: 'Seat Management',
+    subItems: [
+      { href: '/seats/layout-builder', label: 'Seat Layout Builder' },
+      { href: '/seats/ticket-categories', label: 'Ticket Categories' },
+      { href: '/seats/pricing-setup', label: 'Pricing Setup' },
+      { href: '/seats/seat-availability', label: 'Seat Availability' },
+    ],
+  },
   {
     href: '/orders',
     icon: ShoppingCart,
