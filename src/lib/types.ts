@@ -72,4 +72,5 @@ export type TicketPurchase = {
   event: string;
   ticketType: string;
   purchaseDate: string;
+  checkedIn: boolean;
 };
