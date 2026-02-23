@@ -23,9 +23,23 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
+  DollarSign,
+  Clock,
+  XCircle,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { payoutHistory as initialPayoutHistory } from '@/lib/data';
 import { Payout } from '@/lib/types';
+import { Separator } from '@/components/ui/separator';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -39,7 +53,11 @@ export default function PayoutHistoryPage() {
     );
     const combinedPayouts = [...storedPayouts, ...initialPayoutHistory];
     const uniquePayouts = combinedPayouts.filter(
-      (payout, index, self) => index === self.findIndex((p) => p.id === payout.id)
+      (payout, index, self) =>
+        index === self.findIndex((p) => p.id === payout.id)
+    );
+    uniquePayouts.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
     setPayouts(uniquePayouts);
   }, []);
@@ -61,6 +79,17 @@ export default function PayoutHistoryPage() {
     }
   };
 
+  const stats = React.useMemo(() => {
+    const totalCompleted = payouts
+      .filter((p) => p.status === 'Completed')
+      .reduce((sum, p) => sum + p.amount, 0);
+    const pendingCount = payouts.filter(
+      (p) => p.status === 'Pending'
+    ).length;
+    const failedCount = payouts.filter((p) => p.status === 'Failed').length;
+    return { totalCompleted, pendingCount, failedCount };
+  }, [payouts]);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -75,6 +104,55 @@ export default function PayoutHistoryPage() {
           Export CSV
         </Button>
       </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Withdrawn
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              $
+              {stats.totalCompleted.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Across all completed payouts
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Pending Requests
+            </CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.pendingCount}</div>
+            <p className="text-xs text-muted-foreground">
+              Currently being processed
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Failed Payouts</CardTitle>
+            <XCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">
+              {stats.failedCount}
+            </div>
+            <p className="text-xs text-muted-foreground">Require attention</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>All Payouts</CardTitle>
@@ -129,13 +207,94 @@ export default function PayoutHistoryPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon">
-                            <FileText className="h-4 w-4" />
-                            <span className="sr-only">View Details</span>
-                          </Button>
-                          <Button variant="ghost" size="icon">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label="View Details"
+                              >
+                                <FileText className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Payout Details</DialogTitle>
+                                <DialogDescription>
+                                  Transaction ID: {payout.id}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">
+                                    Status
+                                  </span>
+                                  <Badge
+                                    variant={
+                                      payout.status === 'Completed'
+                                        ? 'default'
+                                        : payout.status === 'Pending'
+                                        ? 'secondary'
+                                        : 'destructive'
+                                    }
+                                    className="capitalize"
+                                  >
+                                    {payout.status}
+                                  </Badge>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">
+                                    Date
+                                  </span>
+                                  <span className="font-medium">
+                                    {new Date(payout.date).toLocaleDateString(
+                                      'en-US',
+                                      {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                      }
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">
+                                    Method
+                                  </span>
+                                  <span className="font-medium">
+                                    {payout.method}
+                                  </span>
+                                </div>
+                                <Separator />
+                                <div className="flex items-baseline justify-between">
+                                  <span className="text-muted-foreground">
+                                    Amount
+                                  </span>
+                                  <span className="text-2xl font-bold">
+                                    $
+                                    {payout.amount.toLocaleString('en-US', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    })}
+                                  </span>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button variant="outline">Close</Button>
+                                </DialogClose>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Download Receipt"
+                          >
                             <Download className="h-4 w-4" />
-                            <span className="sr-only">Download Receipt</span>
                           </Button>
                         </div>
                       </TableCell>
