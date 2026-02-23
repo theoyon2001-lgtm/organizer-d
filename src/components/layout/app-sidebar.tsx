@@ -55,7 +55,7 @@ const navItems: (
     icon: Calendar,
     label: 'Events',
     subItems: [
-      { href: '/events/create', label: 'Create Event' },
+      { href: '/events/create', label: 'Create a new event.' },
       { href: '/events/edit', label: 'Edit Event' },
       { href: '/events/clone', label: 'Clone Event' },
       { href: '/events/drafts', label: 'Draft Events' },
