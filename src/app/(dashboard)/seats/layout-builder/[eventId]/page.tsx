@@ -29,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
 type SeatStatus = 'available' | 'selected' | 'booked' | 'unavailable';
@@ -38,6 +37,7 @@ type Seat = {
   id: string;
   status: SeatStatus;
   label: string;
+  pricingTierId?: string;
 };
 
 type Section = {
@@ -46,7 +46,6 @@ type Section = {
   rows: number;
   cols: number;
   seats: Seat[];
-  pricingTierId: string;
 };
 
 type PricingTier = {
@@ -79,9 +78,7 @@ export default function SeatLayoutEditorPage() {
 
   const handleAddSection = () => {
     const newSectionId = `section-${sections.length + 1}`;
-    setSections([
-      ...sections,
-      {
+    const newSection: Section = {
         id: newSectionId,
         name: `Section ${sections.length + 1}`,
         rows: 5,
@@ -91,9 +88,8 @@ export default function SeatLayoutEditorPage() {
           status: 'available',
           label: `${i + 1}`,
         })),
-        pricingTierId: pricingTiersData[0].id,
-      },
-    ]);
+    };
+    setSections([...sections, newSection]);
     setActiveSectionId(newSectionId);
   };
 
@@ -132,13 +128,17 @@ export default function SeatLayoutEditorPage() {
   const handleAssignTier = (tierId: string) => {
     if (selectedSeats.length === 0 || !activeSectionId) return;
 
-     setSections(sections.map(s => {
-      if (s.id === activeSectionId) {
-        // A better implementation would be to assign tier to seat
-        // but for simplicity we assign it to section
-        return { ...s, pricingTierId: tierId };
-      }
-      return s;
+    setSections(sections.map(section => {
+        if (section.id === activeSectionId) {
+            const newSeats = section.seats.map(seat => {
+                if (selectedSeats.includes(seat.id)) {
+                    return { ...seat, pricingTierId: tierId };
+                }
+                return seat;
+            });
+            return { ...section, seats: newSeats };
+        }
+        return section;
     }));
 
     toast({
@@ -148,11 +148,13 @@ export default function SeatLayoutEditorPage() {
 
     setSelectedSeats([]);
   };
-  
-  const getSeatTierColor = (seatId: string) => {
-    const section = sections.find(s => seatId.startsWith(s.id));
-    if (section) {
-        return pricingTiersData.find(t => t.id === section.pricingTierId)?.color.replace('bg-', 'text-');
+
+  const getSeatColor = (seat: Seat) => {
+    if (seat.pricingTierId) {
+        const tier = pricingTiersData.find(t => t.id === seat.pricingTierId);
+        if (tier) {
+            return tier.color.replace('bg-', 'text-');
+        }
     }
     return 'text-muted-foreground/50';
   }
@@ -187,7 +189,7 @@ export default function SeatLayoutEditorPage() {
             <CardHeader>
               <CardTitle>Layout Builder</CardTitle>
               <CardDescription>
-                Click on a section below, then click seats to select them.
+                Click on a section to make it active, then click seats to select them for pricing.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -203,19 +205,16 @@ export default function SeatLayoutEditorPage() {
                   </div>
                 ) : (
                   <div className="w-full space-y-8">
-                    {sections.map(section => {
-                      const tier = pricingTiersData.find(t => t.id === section.pricingTierId);
-                      return (
+                    {sections.map(section => (
                       <div key={section.id} onClick={() => { setActiveSectionId(section.id); setSelectedSeats([]); }} className={cn("p-4 border-2 rounded-lg cursor-pointer transition-colors", activeSectionId === section.id ? "border-primary bg-primary/5" : "border-transparent hover:border-border")}>
                         <div className="flex justify-between items-center mb-4">
                           <h3 className="font-semibold text-lg">{section.name}</h3>
-                          {tier && <Badge style={{backgroundColor: tier.color}} className="text-white">{tier.name}</Badge>}
                         </div>
                         <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${section.cols}, minmax(0, 1fr))` }}>
                           {section.seats.map(seat => {
                              const isSelected = selectedSeats.includes(seat.id);
                              
-                             let colorClass = getSeatTierColor(seat.id);
+                             let colorClass = getSeatColor(seat);
                              if(isSelected) {
                                 colorClass = 'text-primary';
                              } else if (seat.status === 'booked') {
@@ -225,14 +224,14 @@ export default function SeatLayoutEditorPage() {
                              }
 
                             return (
-                              <button key={seat.id} onClick={(e) => { e.stopPropagation(); handleSeatClick(seat.id); }} className={cn("aspect-square flex items-center justify-center rounded-md transition-colors", isSelected && 'bg-primary/10')}>
+                              <button key={seat.id} onClick={(e) => { if(activeSectionId === section.id) {e.stopPropagation(); handleSeatClick(seat.id);} }} className={cn("aspect-square flex items-center justify-center rounded-md transition-colors", isSelected && 'bg-primary/10', activeSectionId === section.id ? 'cursor-pointer' : 'cursor-default')}>
                                 <Armchair className={cn("h-5 w-5", colorClass)} />
                               </button>
                             );
                           })}
                         </div>
                       </div>
-                    )})}
+                    ))}
                   </div>
                 )}
               </div>
@@ -244,7 +243,7 @@ export default function SeatLayoutEditorPage() {
             <CardHeader>
               <CardTitle>Tools & Properties</CardTitle>
               <CardDescription>
-                Manage sections and pricing tiers.
+                Manage sections and their properties.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -260,7 +259,7 @@ export default function SeatLayoutEditorPage() {
                         {sections.map(section => (
                             <div key={section.id} onClick={() => {setActiveSectionId(section.id); setSelectedSeats([])}} className={cn("flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors", activeSectionId === section.id ? "bg-muted" : "hover:bg-muted/50")}>
                                 <p className="font-medium">{section.name}</p>
-                                <Button variant="ghost" size="icon" onClick={(e) => {e.stopPropagation(); setSections(sections.filter(s => s.id !== section.id)); setActiveSectionId(null); setSelectedSeats([])}}>
+                                <Button variant="ghost" size="icon" onClick={(e) => {e.stopPropagation(); setSections(sections.filter(s => s.id !== section.id)); if (activeSectionId === section.id) {setActiveSectionId(null)}; setSelectedSeats([])}}>
                                     <Trash2 className="h-4 w-4 text-destructive" />
                                 </Button>
                             </div>
@@ -298,7 +297,7 @@ export default function SeatLayoutEditorPage() {
           </Card>
           <Card>
               <CardHeader>
-                  <CardTitle>Pricing Tiers</CardTitle>
+                  <CardTitle>Pricing & Tiers</CardTitle>
                   <CardDescription>Assign a pricing tier to the selected seats in the active section.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -321,6 +320,28 @@ export default function SeatLayoutEditorPage() {
                         ))}
                     </SelectContent>
                 </Select>
+                <Separator />
+                <h4 className="font-medium text-sm pt-2">Legend</h4>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                    {pricingTiersData.map(tier => (
+                        <div key={tier.id} className="flex items-center gap-2">
+                            <div className={cn("w-3 h-3 rounded-full", tier.color)} />
+                            <span>{tier.name}</span>
+                        </div>
+                    ))}
+                    <div className="flex items-center gap-2">
+                        <Armchair className="w-4 h-4 text-muted-foreground/50" />
+                        <span>Available</span>
+                    </div>
+                     <div className="flex items-center gap-2">
+                        <Armchair className="w-4 h-4 text-primary" />
+                        <span>Selected</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Armchair className="w-4 h-4 text-destructive" />
+                        <span>Booked</span>
+                    </div>
+                </div>
               </CardContent>
           </Card>
         </div>
