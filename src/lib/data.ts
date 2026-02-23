@@ -2,6 +2,33 @@ import type { Event, Sale } from './types';
 
 export const upcomingEvents: Event[] = [
   {
+    name: 'Winter Wonderfest',
+    date: '2024-01-20',
+    location: 'Millennium Park, Chicago',
+    ticketsSold: 2500,
+    totalTickets: 3000,
+    imageUrl: 'https://picsum.photos/seed/event5/600/400',
+    price: 45,
+  },
+  {
+    name: 'Spring Bloom Festival',
+    date: '2024-04-05',
+    location: 'Brooklyn Botanic Garden, New York',
+    ticketsSold: 1800,
+    totalTickets: 2000,
+    imageUrl: 'https://picsum.photos/seed/event6/600/400',
+    price: 60,
+  },
+  {
+    name: 'Indie Film Showcase',
+    date: '2024-06-12',
+    location: 'TCL Chinese Theatre, Hollywood',
+    ticketsSold: 450,
+    totalTickets: 500,
+    imageUrl: 'https://picsum.photos/seed/event7/600/400',
+    price: 25,
+  },
+  {
     name: 'Summer Music Festival',
     date: '2024-08-15',
     location: 'Central Park, New York',
@@ -36,6 +63,15 @@ export const upcomingEvents: Event[] = [
     totalTickets: 10000,
     imageUrl: 'https://picsum.photos/seed/event4/600/400',
     price: 50,
+  },
+  {
+    name: 'Oktoberfest Celebration',
+    date: '2024-10-15',
+    location: 'Old World Village, Huntington Beach',
+    ticketsSold: 3000,
+    totalTickets: 3500,
+    imageUrl: 'https://picsum.photos/seed/event8/600/400',
+    price: 30,
   },
 ];
 
