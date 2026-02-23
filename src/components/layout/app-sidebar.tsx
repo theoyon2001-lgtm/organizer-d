@@ -22,7 +22,6 @@ import {
   LayoutDashboard,
   Calendar,
   Armchair,
-  ShoppingCart,
   DollarSign,
   TicketPercent,
   BarChart3,
@@ -70,17 +69,6 @@ const navItems: (
       { href: '/seats/ticket-categories', label: 'Ticket Categories' },
       { href: '/seats/pricing-setup', label: 'Pricing Setup' },
       { href: '/seats/seat-availability', label: 'Seat Availability' },
-    ],
-  },
-  {
-    href: '/orders',
-    icon: ShoppingCart,
-    label: 'Orders',
-    subItems: [
-      { href: '/orders/all', label: 'All Orders' },
-      { href: '/orders/refund-requests', label: 'Refund Requests' },
-      { href: '/orders/attendee-list', label: 'Attendee List' },
-      { href: '/orders/export-csv', label: 'Export CSV' },
     ],
   },
   {
