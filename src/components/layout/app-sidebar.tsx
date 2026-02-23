@@ -83,7 +83,16 @@ const navItems: (
       { href: '/orders/export-csv', label: 'Export CSV' },
     ],
   },
-  { href: '/earnings', icon: DollarSign, label: 'Earnings' },
+  {
+    href: '/earnings',
+    icon: DollarSign,
+    label: 'Earnings',
+    subItems: [
+      { href: '/earnings/overview', label: 'Earnings Overview' },
+      { href: '/earnings/commission-breakdown', label: 'Commission Breakdown' },
+      { href: '/earnings/withdrawal-request', label: 'Withdrawal Request' },
+    ],
+  },
   { href: '/promotions', icon: TicketPercent, label: 'Promotions' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
 ];
