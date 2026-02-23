@@ -92,6 +92,7 @@ export default function SegmentationPage() {
     const headers = [
       'Name',
       'Email',
+      'Avatar URL',
       'Event',
       'Ticket Type',
       'Purchase Date',
@@ -100,6 +101,7 @@ export default function SegmentationPage() {
       [
         `"${p.customerName}"`,
         `"${p.customerEmail}"`,
+        `"https://i.pravatar.cc/40?u=${p.customerEmail}"`,
         `"${p.event}"`,
         `"${p.ticketType}"`,
         p.purchaseDate,

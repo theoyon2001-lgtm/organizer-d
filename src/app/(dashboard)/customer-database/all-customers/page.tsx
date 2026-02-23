@@ -146,6 +146,7 @@ export default function AllCustomersPage() {
     const headers = [
       'Name',
       'Email',
+      'Avatar URL',
       'Total Purchases',
       'Total Spent ($)',
       'Last Purchase Date',
@@ -155,6 +156,7 @@ export default function AllCustomersPage() {
       [
         `"${c.name}"`,
         `"${c.email}"`,
+        `"${c.avatar}"`,
         c.totalPurchases,
         c.totalSpent.toFixed(2),
         c.lastPurchaseDate,
