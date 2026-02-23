@@ -111,6 +111,17 @@ export default function CreateEventPage() {
     });
   }
 
+  function handleSaveDraft() {
+    const values = form.getValues();
+    console.log('Saving draft:', values);
+    toast({
+      title: 'Draft Saved',
+      description: `"${
+        values.eventName || 'Untitled Event'
+      }" has been saved as a draft.`,
+    });
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-4">
@@ -497,9 +508,16 @@ export default function CreateEventPage() {
             </CardContent>
           </Card>
 
-          <Button type="submit" className="w-full md:w-auto">
-            Create Event
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button type="submit">Create Event</Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={handleSaveDraft}
+            >
+              Save as Draft
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

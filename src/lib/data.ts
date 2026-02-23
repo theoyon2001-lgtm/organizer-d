@@ -35,6 +35,25 @@ export const upcomingEvents: Event[] = [
   },
 ];
 
+export const draftEvents: Event[] = [
+  {
+    name: 'Untitled Charity Run',
+    date: '2024-11-15',
+    location: 'Venue TBD',
+    ticketsSold: 0,
+    totalTickets: 500,
+    imageUrl: 'https://picsum.photos/seed/draft1/600/400',
+  },
+  {
+    name: 'Annual Tech Summit',
+    date: '2024-12-01',
+    location: 'Convention Center',
+    ticketsSold: 0,
+    totalTickets: 1000,
+    imageUrl: 'https://picsum.photos/seed/draft2/600/400',
+  },
+];
+
 export const salesData: Sale[] = [
   { month: 'Jan', sales: 4000 },
   { month: 'Feb', sales: 3000 },
