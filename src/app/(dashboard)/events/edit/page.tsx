@@ -152,9 +152,6 @@ export default function AllEventsPage() {
                         <Link href="/events/create">Edit</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/events/clone">Clone</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
                         <Link href="/events/analytics">View Analytics</Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

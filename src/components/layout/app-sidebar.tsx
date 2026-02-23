@@ -58,7 +58,6 @@ const navItems: (
     subItems: [
       { href: '/events/edit', label: 'All Events' },
       { href: '/events/create', label: 'Create Event' },
-      { href: '/events/clone', label: 'Clone Event' },
       { href: '/events/drafts', label: 'Draft Events' },
       { href: '/events/analytics', label: 'Analytics' },
     ],
