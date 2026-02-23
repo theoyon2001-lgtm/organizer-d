@@ -35,7 +35,7 @@
     --radius: 0.5rem;
 
     /* Custom Sidebar vars */
-    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-background: 218 53% 19%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 231 48% 48%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -75,7 +75,7 @@
     --ring: 224.3 76.3% 48%;
 
     /* Custom Sidebar vars for dark mode */
-    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-background: 218 53% 19%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 231 48% 48%;
     --sidebar-primary-foreground: 0 0% 98%;
