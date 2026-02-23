@@ -99,7 +99,6 @@ const navItems: (
       { href: '/customer-database/all-customers', label: 'All Customers' },
       { href: '/customer-database/segmentation', label: 'Segmentation' },
       { href: '/customer-database/bulk-actions', label: 'Bulk Actions' },
-      { href: '/customer-database/customer-logs', label: 'Customer Logs' },
       { href: '/customer-database/backup-restore', label: 'Backup & Restore' },
     ],
   },
