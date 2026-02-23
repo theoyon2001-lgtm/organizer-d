@@ -17,7 +17,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Download, Users, Ticket, CalendarCheck, Filter } from 'lucide-react';
+import {
+  Download,
+  Users,
+  Ticket,
+  CalendarCheck,
+  Filter,
+  TicketPercent,
+} from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -36,23 +43,42 @@ export default function SegmentationPage() {
   const [selectedEvent, setSelectedEvent] = React.useState(
     upcomingEvents[0]?.name || 'all'
   );
+  const [selectedTicketType, setSelectedTicketType] = React.useState('all');
+
+  // When event filter changes, reset ticket type filter
+  React.useEffect(() => {
+    setSelectedTicketType('all');
+  }, [selectedEvent]);
+
+  const availableTicketTypes = React.useMemo(() => {
+    if (selectedEvent === 'all') {
+      return [];
+    }
+    const types = ticketPurchases
+      .filter((purchase) => purchase.event === selectedEvent)
+      .map((purchase) => purchase.ticketType);
+    return [...new Set(types)];
+  }, [selectedEvent]);
 
   const filteredCustomers = React.useMemo(() => {
-    if (selectedEvent === 'all') {
-      return ticketPurchases;
-    }
-    return ticketPurchases.filter(
-      (purchase) => purchase.event === selectedEvent
-    );
-  }, [selectedEvent]);
+    return ticketPurchases.filter((purchase) => {
+      const eventMatch =
+        selectedEvent === 'all' || purchase.event === selectedEvent;
+      const ticketTypeMatch =
+        selectedTicketType === 'all' ||
+        purchase.ticketType === selectedTicketType;
+      return eventMatch && ticketTypeMatch;
+    });
+  }, [selectedEvent, selectedTicketType]);
 
   const stats = React.useMemo(() => {
     const totalCustomers = filteredCustomers.length;
     const uniqueTicketTypes = new Set(
       filteredCustomers.map((c) => c.ticketType)
     ).size;
-    return { totalCustomers, uniqueTicketTypes };
-  }, [filteredCustomers]);
+    const eventName = selectedEvent === 'all' ? 'All Events' : selectedEvent;
+    return { totalCustomers, uniqueTicketTypes, eventName };
+  }, [filteredCustomers, selectedEvent]);
 
   const handleExport = () => {
     if (filteredCustomers.length === 0) {
@@ -107,7 +133,7 @@ export default function SegmentationPage() {
           Customer Segmentation
         </h1>
         <p className="text-muted-foreground">
-          View customer lists based on the event they attended.
+          Filter and view customer lists by event and ticket type.
         </p>
       </div>
 
@@ -115,7 +141,7 @@ export default function SegmentationPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Customers
+              Filtered Customers
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -123,7 +149,7 @@ export default function SegmentationPage() {
             <div className="text-2xl font-bold">
               {stats.totalCustomers.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">For selected event</p>
+            <p className="text-xs text-muted-foreground">Matching selection</p>
           </CardContent>
         </Card>
         <Card>
@@ -132,9 +158,7 @@ export default function SegmentationPage() {
             <CalendarCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="truncate text-lg font-bold">
-              {selectedEvent === 'all' ? 'All Events' : selectedEvent}
-            </div>
+            <div className="truncate text-lg font-bold">{stats.eventName}</div>
             <p className="text-xs text-muted-foreground">
               Currently selected event
             </p>
@@ -143,7 +167,7 @@ export default function SegmentationPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ticket Types</CardTitle>
-            <Ticket className="h-4 w-4 text-muted-foreground" />
+            <TicketPercent className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -158,9 +182,9 @@ export default function SegmentationPage() {
         <CardHeader>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle>Event-based Segments</CardTitle>
+              <CardTitle>Filtered Customer List</CardTitle>
               <CardDescription>
-                Select an event to view the list of customers who made a
+                Select filters to view the list of customers who made a
                 purchase.
               </CardDescription>
             </div>
@@ -174,12 +198,12 @@ export default function SegmentationPage() {
           <div className="mb-6 flex flex-wrap items-center gap-4 rounded-lg bg-muted/50 p-4">
             <div className="flex items-center gap-2 font-semibold text-muted-foreground">
               <Filter className="h-5 w-5" />
-              <span>Filter by Event:</span>
+              <span>Filters:</span>
             </div>
             <Select value={selectedEvent} onValueChange={setSelectedEvent}>
               <SelectTrigger
                 className={cn(
-                  'w-full sm:w-[320px]',
+                  'w-full sm:w-[280px]',
                   selectedEvent !== 'all' &&
                     'border-primary/30 bg-primary/5 font-medium text-primary hover:bg-primary/10'
                 )}
@@ -195,6 +219,26 @@ export default function SegmentationPage() {
                 ))}
               </SelectContent>
             </Select>
+            <Select
+              value={selectedTicketType}
+              onValueChange={setSelectedTicketType}
+              disabled={selectedEvent === 'all'}
+            >
+              <SelectTrigger
+                className="w-full sm:w-[280px]"
+                disabled={selectedEvent === 'all'}
+              >
+                <SelectValue placeholder="Filter by ticket type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Ticket Types</SelectItem>
+                {availableTicketTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="overflow-x-auto">
@@ -202,6 +246,7 @@ export default function SegmentationPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Customer</TableHead>
+                  <TableHead>Event</TableHead>
                   <TableHead>Ticket Type</TableHead>
                   <TableHead className="text-right">Purchase Date</TableHead>
                 </TableRow>
@@ -231,19 +276,23 @@ export default function SegmentationPage() {
                           </div>
                         </div>
                       </TableCell>
+                      <TableCell>{purchase.event}</TableCell>
                       <TableCell>{purchase.ticketType}</TableCell>
                       <TableCell className="text-right">
-                        {new Date(purchase.purchaseDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        {new Date(purchase.purchaseDate).toLocaleDateString(
+                          'en-US',
+                          { year: 'numeric', month: 'long', day: 'numeric' }
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={3}
+                      colSpan={4}
                       className="h-24 text-center text-muted-foreground"
                     >
-                      No customers found for this event.
+                      No customers found for the selected filters.
                     </TableCell>
                   </TableRow>
                 )}
