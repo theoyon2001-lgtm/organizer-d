@@ -302,7 +302,7 @@ export default function AllCustomersPage() {
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">{customer.lastPurchaseEvent}</div>
-                        <div className="text-sm text-muted-foreground">{new Date(customer.lastPurchaseDate).toLocaleDateString()}</div>
+                        <div className="text-sm text-muted-foreground">{new Date(customer.lastPurchaseDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
                       </TableCell>
                     </TableRow>
                   ))

@@ -233,7 +233,7 @@ export default function SegmentationPage() {
                       </TableCell>
                       <TableCell>{purchase.ticketType}</TableCell>
                       <TableCell className="text-right">
-                        {new Date(purchase.purchaseDate).toLocaleDateString()}
+                        {new Date(purchase.purchaseDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </TableCell>
                     </TableRow>
                   ))
