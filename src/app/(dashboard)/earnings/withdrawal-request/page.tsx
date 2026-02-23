@@ -27,8 +27,16 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Landmark, Smartphone, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const availableForPayout = 10748.61;
+const mobileBankingMethods = ['bKash', 'Nagad', 'Rocket', 'Upay'] as const;
 
 const formSchema = z
   .object({
@@ -45,6 +53,7 @@ const formSchema = z
     accountHolderName: z.string().optional(),
     accountNumber: z.string().optional(),
     branchAddress: z.string().optional(),
+    mobileMethod: z.enum(mobileBankingMethods).optional(),
     mobileNumber: z.string().optional(),
   })
   .superRefine((data, ctx) => {
@@ -72,6 +81,13 @@ const formSchema = z
       }
     }
     if (data.payoutMethod === 'mobile') {
+      if (!data.mobileMethod) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Please select a mobile banking service.',
+          path: ['mobileMethod'],
+        });
+      }
       if (!data.mobileNumber || data.mobileNumber.length < 10) {
         ctx.addIssue({
           code: 'custom',
@@ -92,6 +108,7 @@ export default function WithdrawalRequestPage() {
   });
 
   const watchedMethod = form.watch('payoutMethod');
+  const watchedMobileMethod = form.watch('mobileMethod');
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -174,7 +191,15 @@ export default function WithdrawalRequestPage() {
                     <FormLabel>Payout Method</FormLabel>
                     <FormControl>
                       <RadioGroup
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Reset other method's fields to avoid submitting incorrect data
+                          form.setValue('mobileMethod', undefined);
+                          form.setValue('mobileNumber', '');
+                          form.setValue('accountHolderName', '');
+                          form.setValue('accountNumber', '');
+                          form.setValue('branchAddress', '');
+                        }}
                         defaultValue={field.value}
                         className="grid grid-cols-1 gap-4 md:grid-cols-2"
                       >
@@ -281,17 +306,50 @@ export default function WithdrawalRequestPage() {
                   <CardContent className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="mobileNumber"
+                      name="mobileMethod"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Mobile Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="(123) 456-7890" {...field} />
-                          </FormControl>
+                          <FormLabel>Service Provider</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a service" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {mobileBankingMethods.map((method) => (
+                                <SelectItem key={method} value={method}>
+                                  {method}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    {watchedMobileMethod && (
+                      <FormField
+                        control={form.control}
+                        name="mobileNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Account Number</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., 01712345678"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </CardContent>
                 </Card>
               )}
