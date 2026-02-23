@@ -7,6 +7,7 @@ import type {
   Commission,
   CommissionChartData,
   DailySale,
+  TicketTypeSale,
 } from './types';
 
 export const upcomingEvents: Event[] = [
@@ -213,3 +214,20 @@ export const dailySales: DailySale[] = Array.from({ length: 90 }, (_, i) => {
     revenue: parseFloat(revenue.toFixed(2)),
   };
 }).reverse();
+
+export const ticketTypeSalesData: TicketTypeSale[] = [
+  { event: 'Summer Music Festival', ticketType: 'General Admission', ticketsSold: 3500, price: 75, revenue: 262500 },
+  { event: 'Summer Music Festival', ticketType: 'VIP', ticketsSold: 1000, price: 150, revenue: 150000 },
+  { event: 'Tech Conference 2024', ticketType: 'Standard Pass', ticketsSold: 900, price: 499, revenue: 449100 },
+  { event: 'Tech Conference 2024', ticketType: 'Workshop Add-on', ticketsSold: 300, price: 199, revenue: 59700 },
+  { event: 'Art & Wine Fair', ticketType: 'Tasting Ticket', ticketsSold: 250, price: 120, revenue: 30000 },
+  { event: 'Art & Wine Fair', ticketType: 'Non-Drinker', ticketsSold: 100, price: 40, revenue: 4000 },
+  { event: 'Winter Wonderfest', ticketType: 'Adult', ticketsSold: 2000, price: 45, revenue: 90000 },
+  { event: 'Winter Wonderfest', ticketType: 'Child', ticketsSold: 500, price: 25, revenue: 12500 },
+  { event: 'Spring Bloom Festival', ticketType: 'Any-Day Pass', ticketsSold: 1800, price: 60, revenue: 108000 },
+  { event: 'Indie Film Showcase', ticketType: 'Single Screening', ticketsSold: 300, price: 25, revenue: 7500 },
+  { event: 'Indie Film Showcase', ticketType: 'All-Day Pass', ticketsSold: 150, price: 70, revenue: 10500 },
+  { event: 'Marathon of Hope', ticketType: 'Runner Registration', ticketsSold: 8000, price: 50, revenue: 400000 },
+  { event: 'Oktoberfest Celebration', ticketType: 'Beer Stein Package', ticketsSold: 2500, price: 30, revenue: 75000 },
+  { event: 'Oktoberfest Celebration', ticketType: 'General Entry', ticketsSold: 500, price: 15, revenue: 7500 },
+];

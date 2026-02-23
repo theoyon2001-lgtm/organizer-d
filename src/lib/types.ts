@@ -56,3 +56,11 @@ export type DailySale = {
   ticketsSold: number;
   revenue: number;
 };
+
+export type TicketTypeSale = {
+  event: string;
+  ticketType: string;
+  ticketsSold: number;
+  price: number;
+  revenue: number;
+};
