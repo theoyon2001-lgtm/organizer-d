@@ -8,6 +8,7 @@ export const upcomingEvents: Event[] = [
     ticketsSold: 4500,
     totalTickets: 5000,
     imageUrl: 'https://picsum.photos/seed/event1/600/400',
+    price: 75,
   },
   {
     name: 'Tech Conference 2024',
@@ -16,6 +17,7 @@ export const upcomingEvents: Event[] = [
     ticketsSold: 1200,
     totalTickets: 1500,
     imageUrl: 'https://picsum.photos/seed/event2/600/400',
+    price: 499,
   },
   {
     name: 'Art & Wine Fair',
@@ -24,6 +26,7 @@ export const upcomingEvents: Event[] = [
     ticketsSold: 350,
     totalTickets: 400,
     imageUrl: 'https://picsum.photos/seed/event3/600/400',
+    price: 120,
   },
   {
     name: 'Marathon of Hope',
@@ -32,6 +35,7 @@ export const upcomingEvents: Event[] = [
     ticketsSold: 8000,
     totalTickets: 10000,
     imageUrl: 'https://picsum.photos/seed/event4/600/400',
+    price: 50,
   },
 ];
 

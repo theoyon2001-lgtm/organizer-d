@@ -5,6 +5,7 @@ export type Event = {
   ticketsSold: number;
   totalTickets: number;
   imageUrl?: string;
+  price?: number;
 };
 
 export type Sale = {
