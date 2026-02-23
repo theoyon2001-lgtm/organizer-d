@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,15 +24,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { upcomingEvents } from '@/lib/data';
+import Link from 'next/link';
 
 export default function AllEventsPage() {
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">All Events</h1>
-        <p className="text-muted-foreground">
-          View and manage all of your events.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">All Events</h1>
+          <p className="text-muted-foreground">
+            View and manage all of your events.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/events/create">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Event
+          </Link>
+        </Button>
       </div>
       <Card>
         <CardHeader>
@@ -45,7 +54,9 @@ export default function AllEventsPage() {
               <TableRow>
                 <TableHead>Event</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">Tickets Sold</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Tickets Sold
+                </TableHead>
                 <TableHead className="hidden md:table-cell">Date</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
@@ -62,12 +73,29 @@ export default function AllEventsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={new Date(event.date).getTime() > new Date().getTime() ? "outline" : "secondary"}>
-                      {new Date(event.date).getTime() > new Date().getTime() ? 'Upcoming' : 'Past'}
+                    <Badge
+                      variant={
+                        new Date(event.date).getTime() > new Date().getTime()
+                          ? 'outline'
+                          : 'secondary'
+                      }
+                    >
+                      {new Date(event.date).getTime() > new Date().getTime()
+                        ? 'Upcoming'
+                        : 'Past'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{event.ticketsSold.toLocaleString()} / {event.totalTickets.toLocaleString()}</TableCell>
-                  <TableCell className="hidden md:table-cell">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {event.ticketsSold.toLocaleString()} /{' '}
+                    {event.totalTickets.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {new Date(event.date).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
