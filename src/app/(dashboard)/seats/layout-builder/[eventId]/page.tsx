@@ -17,7 +17,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { upcomingEvents } from '@/lib/data';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import React, { useState } from 'react';
@@ -62,11 +62,8 @@ const pricingTiersData: PricingTier[] = [
   { id: 'tier-3', name: 'Economy', price: 40.0, color: 'bg-green-500' },
 ];
 
-export default function SeatLayoutEditorPage({
-  params,
-}: {
-  params: { eventId: string };
-}) {
+export default function SeatLayoutEditorPage() {
+  const params = useParams<{ eventId: string }>();
   const event = upcomingEvents.find((e) => e.id === params.eventId);
   const { toast } = useToast();
 
