@@ -10,6 +10,15 @@ import type {
   TicketTypeSale,
 } from './types';
 
+// Add a seeded random generator to ensure consistent data between server and client
+const createSeededRandom = (seed: number) => {
+  let state = seed;
+  return () => {
+    state = (state * 9301 + 49297) % 233280;
+    return state / 233280;
+  };
+};
+
 export const upcomingEvents: Event[] = [
   {
     id: 'winter-wonderfest',
@@ -205,9 +214,16 @@ export const commissionChartData: CommissionChartData[] = [
 ];
 
 export const dailySales: DailySale[] = Array.from({ length: 90 }, (_, i) => {
-  const date = subDays(new Date(), i);
-  const ticketsSold = Math.floor(Math.random() * 80) + 20;
-  const revenue = ticketsSold * (Math.random() * 40 + 15);
+  // Use a seed that is consistent for each item in the array
+  const seed1 = (i + 1) * 100;
+  const seed2 = (i + 1) * 200;
+  const random1 = createSeededRandom(seed1);
+  const random2 = createSeededRandom(seed2);
+
+  // Use a fixed date to avoid hydration errors from new Date()
+  const date = subDays(new Date('2024-07-23'), i);
+  const ticketsSold = Math.floor(random1() * 80) + 20;
+  const revenue = ticketsSold * (random2() * 40 + 15);
   return {
     date: format(date, 'yyyy-MM-dd'),
     ticketsSold: ticketsSold,
