@@ -26,6 +26,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Landmark, Smartphone, Wallet } from 'lucide-react';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
 
 const availableForPayout = 10748.61;
 
