@@ -28,12 +28,53 @@ import {
 import { payoutHistory } from '@/lib/data';
 import EarningsChart from './earnings-chart';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+import { Payout } from '@/lib/types';
 
 export default function EarningsOverviewPage() {
+  const { toast } = useToast();
   const totalEarnings = 55980.5;
   const monthlyEarnings = 7850.0;
   const totalPayouts = 45231.89;
   const availableForPayout = totalEarnings - totalPayouts;
+
+  const handleExport = (data: Payout[], fileName: string) => {
+    if (data.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No data to export',
+      });
+      return;
+    }
+
+    const headers = ['ID', 'Date', 'Amount', 'Method', 'Status'];
+    const csvRows = data.map((payout) =>
+      [
+        payout.id,
+        payout.date,
+        `"${payout.amount.toFixed(2)}"`,
+        payout.method,
+        payout.status,
+      ].join(',')
+    );
+
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${fileName}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Export Successful',
+      description: 'Your payout history has been downloaded.',
+    });
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,7 +88,12 @@ export default function EarningsOverviewPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            onClick={() =>
+              handleExport(payoutHistory, 'recent-payouts-overview')
+            }
+          >
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>

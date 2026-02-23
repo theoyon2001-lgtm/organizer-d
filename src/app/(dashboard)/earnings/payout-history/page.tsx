@@ -40,6 +40,7 @@ import {
 import { payoutHistory as initialPayoutHistory } from '@/lib/data';
 import { Payout } from '@/lib/types';
 import Invoice from './invoice';
+import { useToast } from '@/hooks/use-toast';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -119,6 +120,7 @@ const InvoiceDialogContent = ({ payout }: { payout: Payout }) => {
 };
 
 export default function PayoutHistoryPage() {
+  const { toast } = useToast();
   const [payouts, setPayouts] = React.useState<Payout[]>(initialPayoutHistory);
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -165,6 +167,45 @@ export default function PayoutHistoryPage() {
     return { totalCompleted, pendingCount, failedCount };
   }, [payouts]);
 
+  const handleExport = () => {
+    if (payouts.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No data to export',
+        description: 'There is no payout history to export.',
+      });
+      return;
+    }
+
+    const headers = ['ID', 'Date', 'Amount', 'Method', 'Status'];
+    const csvRows = payouts.map((payout) =>
+      [
+        payout.id,
+        payout.date,
+        `"${payout.amount.toFixed(2)}"`,
+        payout.method,
+        payout.status,
+      ].join(',')
+    );
+
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'payout-history.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Export Successful',
+      description: 'Your full payout history has been downloaded.',
+    });
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -174,7 +215,7 @@ export default function PayoutHistoryPage() {
             A detailed record of all your past payouts.
           </p>
         </div>
-        <Button variant="outline">
+        <Button variant="outline" onClick={handleExport}>
           <Download className="mr-2 h-4 w-4" />
           Export CSV
         </Button>

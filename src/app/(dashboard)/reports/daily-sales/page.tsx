@@ -47,6 +47,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { useToast } from '@/hooks/use-toast';
 
 const chartConfig = {
   revenue: {
@@ -58,6 +59,7 @@ const chartConfig = {
 const ITEMS_PER_PAGE = 10;
 
 export default function DailySalesPage() {
+  const { toast } = useToast();
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: subDays(new Date(), 29),
     to: new Date(),
@@ -113,6 +115,48 @@ export default function DailySalesPage() {
     }
   };
 
+  const handleExport = () => {
+    if (filteredSales.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No data to export',
+        description: 'Please select a date range with sales data.',
+      });
+      return;
+    }
+
+    const headers = ['Date', 'Tickets Sold', 'Revenue'];
+    const csvRows = filteredSales.map((sale) =>
+      [
+        sale.date,
+        sale.ticketsSold,
+        `"${sale.revenue.toFixed(2)}"`,
+      ].join(',')
+    );
+
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    const fromDate = date?.from ? format(date.from, 'yyyy-MM-dd') : 'start';
+    const toDate = date?.to ? format(date.to, 'yyyy-MM-dd') : 'end';
+    link.setAttribute(
+      'download',
+      `daily-sales-report_${fromDate}_to_${toDate}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Export Successful',
+      description: 'Your daily sales report has been downloaded.',
+    });
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -161,7 +205,7 @@ export default function DailySalesPage() {
               />
             </PopoverContent>
           </Popover>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExport}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
