@@ -41,20 +41,28 @@ const navItems: (
       href: string;
       icon: React.ElementType;
       label: string;
+      iconClassName?: string;
       subItems?: undefined;
     }
   | {
       href: string;
       icon: React.ElementType;
       label: string;
+      iconClassName?: string;
       subItems: { href: string; label: string }[];
     }
 )[] = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  {
+    href: '/dashboard',
+    icon: LayoutDashboard,
+    label: 'Dashboard',
+    iconClassName: 'text-chart-1',
+  },
   {
     href: '/events',
     icon: Calendar,
     label: 'Events',
+    iconClassName: 'text-chart-2',
     subItems: [
       { href: '/events/edit', label: 'All Events' },
       { href: '/events/create', label: 'Create Event' },
@@ -66,6 +74,7 @@ const navItems: (
     href: '/seats',
     icon: Armchair,
     label: 'Seat Management',
+    iconClassName: 'text-primary',
     subItems: [
       { href: '/seats/layout-builder', label: 'Seat Layout Builder' },
       { href: '/seats/seat-availability', label: 'Seat Availability' },
@@ -75,6 +84,7 @@ const navItems: (
     href: '/earnings',
     icon: DollarSign,
     label: 'Earnings',
+    iconClassName: 'text-chart-4',
     subItems: [
       { href: '/earnings/overview', label: 'Earnings Overview' },
       { href: '/earnings/withdrawal-request', label: 'Withdrawal Request' },
@@ -85,6 +95,7 @@ const navItems: (
     href: '/reports',
     icon: BarChart3,
     label: 'Reports',
+    iconClassName: 'text-chart-5',
     subItems: [
       { href: '/reports/daily-sales', label: 'Daily Sales' },
       { href: '/reports/ticket-type-sales', label: 'Ticket Type Sales' },
@@ -95,6 +106,7 @@ const navItems: (
     href: '/customer-database',
     icon: Users,
     label: 'Customer Database',
+    iconClassName: 'text-success',
     subItems: [
       { href: '/customer-database/all-customers', label: 'All Customers' },
       { href: '/customer-database/segmentation', label: 'Segmentation' },
@@ -135,7 +147,7 @@ export default function AppSidebar() {
                       tooltip={{ children: item.label, side: 'right' }}
                       className="group w-full"
                     >
-                      <item.icon />
+                      <item.icon className={item.iconClassName} />
                       <span>{item.label}</span>
                       <ChevronRight className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
                     </SidebarMenuButton>
@@ -164,7 +176,7 @@ export default function AppSidebar() {
                   tooltip={{ children: item.label, side: 'right' }}
                 >
                   <Link href={item.href}>
-                    <item.icon />
+                    <item.icon className={item.iconClassName} />
                     <span>{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
@@ -183,7 +195,7 @@ export default function AppSidebar() {
               tooltip={{ children: 'Settings', side: 'right' }}
             >
               <Link href="/settings">
-                <Settings />
+                <Settings className="text-accent" />
                 <span>Settings</span>
               </Link>
             </SidebarMenuButton>
