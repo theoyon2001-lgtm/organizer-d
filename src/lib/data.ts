@@ -1,4 +1,13 @@
-import type { Event, Sale, Revenue, Payout, Commission, CommissionChartData } from './types';
+import { format, subDays } from 'date-fns';
+import type {
+  Event,
+  Sale,
+  Revenue,
+  Payout,
+  Commission,
+  CommissionChartData,
+  DailySale,
+} from './types';
 
 export const upcomingEvents: Event[] = [
   {
@@ -193,3 +202,14 @@ export const commissionChartData: CommissionChartData[] = [
   { month: 'Jun', revenue: 7200, commission: 720 },
   { month: 'Jul', revenue: 7850, commission: 785 },
 ];
+
+export const dailySales: DailySale[] = Array.from({ length: 90 }, (_, i) => {
+  const date = subDays(new Date(), i);
+  const ticketsSold = Math.floor(Math.random() * 80) + 20;
+  const revenue = ticketsSold * (Math.random() * 40 + 15);
+  return {
+    date: format(date, 'yyyy-MM-dd'),
+    ticketsSold: ticketsSold,
+    revenue: parseFloat(revenue.toFixed(2)),
+  };
+}).reverse();

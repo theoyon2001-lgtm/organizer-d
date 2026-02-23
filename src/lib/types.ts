@@ -50,3 +50,9 @@ export type CommissionChartData = {
   revenue: number;
   commission: number;
 };
+
+export type DailySale = {
+  date: string;
+  ticketsSold: number;
+  revenue: number;
+};
