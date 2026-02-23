@@ -16,28 +16,34 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Download,
-  Mail,
-  Trash2,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
+  Filter,
   Search,
+  Users,
+  Info,
+  Ticket,
+  CheckCircle2,
+  MoreVertical,
+  Mail,
+  Download,
+  Trash2,
+  Clock,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { ticketPurchases, ticketTypeSalesData } from '@/lib/data';
+import {
+  ticketPurchases as allTicketPurchases,
+  upcomingEvents,
+} from '@/lib/data';
 import { TicketPurchase } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -50,111 +56,52 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-
-const ITEMS_PER_PAGE = 10;
-
-type Customer = {
-  name: string;
-  email: string;
-  avatar: string;
-  totalPurchases: number;
-  totalSpent: number;
-  lastPurchaseDate: string;
-  lastPurchaseEvent: string;
-};
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 export default function BulkActionsPage() {
   const { toast } = useToast();
-  const [customers, setCustomers] = React.useState<Customer[]>([]);
+  const [attendees, setAttendees] =
+    React.useState<TicketPurchase[]>(allTicketPurchases);
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<string[]>([]);
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [currentPage, setCurrentPage] = React.useState(1);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [selectedEventId, setSelectedEventId] = React.useState<string>(
+    upcomingEvents[0].id
+  );
 
-  React.useEffect(() => {
-    const customerMap = new Map<
-      string,
-      {
-        name: string;
-        email: string;
-        purchases: TicketPurchase[];
-        avatar: string;
-      }
-    >();
+  const selectedEvent = React.useMemo(() => {
+    return upcomingEvents.find((event) => event.id === selectedEventId);
+  }, [selectedEventId]);
 
-    ticketPurchases.forEach((purchase) => {
-      if (!customerMap.has(purchase.customerEmail)) {
-        customerMap.set(purchase.customerEmail, {
-          name: purchase.customerName,
-          email: purchase.customerEmail,
-          purchases: [],
-          avatar: `https://i.pravatar.cc/40?u=${purchase.customerEmail}`,
-        });
-      }
-      customerMap.get(purchase.customerEmail)!.purchases.push(purchase);
-    });
+  const filteredAttendees = React.useMemo(() => {
+    if (!selectedEvent) return [];
+    return attendees
+      .filter((attendee) => attendee.event === selectedEvent?.name)
+      .filter(
+        (attendee) =>
+          attendee.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          attendee.customerEmail.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+  }, [attendees, selectedEvent, searchTerm]);
 
-    const allCustomers = Array.from(customerMap.values()).map((customer) => {
-      const totalSpent = customer.purchases.reduce((acc, p) => {
-        const saleInfo = ticketTypeSalesData.find(
-          (s) => s.event === p.event && s.ticketType === p.ticketType
-        );
-        return acc + (saleInfo?.price || 0);
-      }, 0);
-
-      const lastPurchase = customer.purchases.sort(
-        (a, b) =>
-          new Date(b.purchaseDate).getTime() -
-          new Date(a.purchaseDate).getTime()
-      )[0];
-
-      return {
-        ...customer,
-        totalPurchases: customer.purchases.length,
-        totalSpent,
-        lastPurchaseDate: lastPurchase.purchaseDate,
-        lastPurchaseEvent: lastPurchase.event,
-      };
-    });
-    setCustomers(allCustomers);
-  }, []);
-
-  const filteredCustomers = React.useMemo(() => {
-    return customers.filter(
-      (customer) =>
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [customers, searchTerm]);
-
-  const totalPages = Math.ceil(filteredCustomers.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentCustomers = filteredCustomers.slice(startIndex, endIndex);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const isAllCurrentPageRowsSelected =
-    currentCustomers.length > 0 &&
-    currentCustomers.every((c) => selectedRowKeys.includes(c.email));
+  const isAllRowsSelected =
+    filteredAttendees.length > 0 &&
+    filteredAttendees.every((c) => selectedRowKeys.includes(c.purchaseId));
 
   const handleSelectAll = (checked: boolean | string) => {
     if (checked) {
-      const currentPageKeys = currentCustomers.map((c) => c.email);
-      setSelectedRowKeys((prev) => [...new Set([...prev, ...currentPageKeys])]);
+      const currentPageKeys = filteredAttendees.map((c) => c.purchaseId);
+      setSelectedRowKeys(currentPageKeys);
     } else {
-      const currentPageKeys = currentCustomers.map((c) => c.email);
-      setSelectedRowKeys((prev) => prev.filter((k) => !currentPageKeys.includes(k)));
+      setSelectedRowKeys([]);
     }
   };
 
@@ -169,26 +116,30 @@ export default function BulkActionsPage() {
   };
 
   const handleExportSelected = () => {
-    const selected = customers.filter((c) => selectedRowKeys.includes(c.email));
+    const selected = attendees.filter((c) =>
+      selectedRowKeys.includes(c.purchaseId)
+    );
     if (selected.length === 0) {
-      toast({ variant: 'destructive', title: 'No customers selected' });
+      toast({ variant: 'destructive', title: 'No attendees selected' });
       return;
     }
 
     const headers = [
       'Name',
       'Email',
-      'Avatar URL',
-      'Total Purchases',
-      'Total Spent ($)',
+      'Event',
+      'Ticket Type',
+      'Registration Date',
+      'Fulfillment Status',
     ];
     const csvRows = selected.map((c) =>
       [
-        `"${c.name}"`,
-        `"${c.email}"`,
-        `"${c.avatar}"`,
-        c.totalPurchases,
-        c.totalSpent.toFixed(2),
+        `"${c.customerName}"`,
+        `"${c.customerEmail}"`,
+        `"${c.event}"`,
+        `"${c.ticketType}"`,
+        c.purchaseDate,
+        c.checkedIn ? 'Confirmed' : 'Pending',
       ].join(',')
     );
     const csvContent = [headers.join(','), ...csvRows].join('\n');
@@ -196,7 +147,7 @@ export default function BulkActionsPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'selected_customers.csv');
+    link.setAttribute('download', 'selected_attendees.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -204,22 +155,24 @@ export default function BulkActionsPage() {
 
     toast({
       title: 'Export Successful',
-      description: `${selected.length} customers exported.`,
+      description: `${selected.length} attendees exported.`,
     });
   };
 
   const handleSendEmail = () => {
     toast({
       title: 'Action: Send Email',
-      description: `An email would be sent to ${selectedRowKeys.length} customer(s).`,
+      description: `An email would be sent to ${selectedRowKeys.length} attendee(s).`,
     });
   };
 
   const handleDeleteSelected = () => {
-    setCustomers((prev) => prev.filter((c) => !selectedRowKeys.includes(c.email)));
+    setAttendees((prev) =>
+      prev.filter((c) => !selectedRowKeys.includes(c.purchaseId))
+    );
     toast({
-      title: 'Customers Deleted',
-      description: `${selectedRowKeys.length} customer(s) have been deleted.`,
+      title: 'Attendees Deleted',
+      description: `${selectedRowKeys.length} attendee(s) have been deleted.`,
     });
     setSelectedRowKeys([]);
     setIsDeleteDialogOpen(false);
@@ -227,182 +180,229 @@ export default function BulkActionsPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bulk Actions</h1>
-          <p className="text-muted-foreground">
-            Select customers to perform actions like exporting or deleting.
-          </p>
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Client Command Center
+            </h1>
+            <p className="text-muted-foreground">
+              Perform high-velocity bulk operations on your event attendees.
+            </p>
+          </div>
+          <Button variant="outline">
+            <Users className="mr-2 h-4 w-4" />
+            {filteredAttendees.length} Attendees Found
+          </Button>
         </div>
+
+        <Card className="p-4">
+          <div className="flex flex-col items-center gap-4 md:flex-row">
+            <div className="flex items-center gap-2 self-start text-sm font-semibold text-muted-foreground md:self-center">
+              <Filter className="h-5 w-5" />
+              FILTERS:
+            </div>
+            <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+              <SelectTrigger className="w-full md:w-[300px]">
+                <SelectValue placeholder="Select an event" />
+              </SelectTrigger>
+              <SelectContent>
+                {upcomingEvents.map((event) => (
+                  <SelectItem key={event.id} value={event.id}>
+                    <div className="flex flex-col">
+                      <span>{event.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(event.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="relative w-full flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10"
+              />
+            </div>
+          </div>
+        </Card>
+
         <Card>
           <CardHeader>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <CardTitle>Customer List</CardTitle>
+                <CardTitle>Client Directory</CardTitle>
                 <CardDescription>
-                  {selectedRowKeys.length > 0
-                    ? `${selectedRowKeys.length} of ${customers.length} customers selected.`
-                    : `Select customers by using the checkboxes.`}
+                  Select clients to reveal the bulk action command bar.
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1 sm:flex-initial">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Search customers..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full pl-10 sm:w-64"
-                  />
+              {selectedEvent && (
+                <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground sm:mt-0">
+                  <Info className="h-4 w-4" />
+                  <span>
+                    SHOWING RESULTS FOR {selectedEvent.name.toUpperCase()}
+                  </span>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      disabled={selectedRowKeys.length === 0}
-                    >
-                      Bulk Actions
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem onSelect={handleSendEmail}>
-                      <Mail className="mr-2 h-4 w-4" />
-                      Send Email
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleExportSelected}>
-                      <Download className="mr-2 h-4 w-4" />
-                      Export Selected
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onSelect={() => setIsDeleteDialogOpen(true)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Selected
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[50px]">
+                    <TableHead className="w-[50px] pl-4">
                       <Checkbox
-                        checked={isAllCurrentPageRowsSelected}
+                        checked={isAllRowsSelected}
                         onCheckedChange={handleSelectAll}
                         aria-label="Select all"
                       />
                     </TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Last Purchase</TableHead>
-                    <TableHead className="text-right">Total Spent</TableHead>
+                    <TableHead>Client Identity</TableHead>
+                    <TableHead>Ticket Type</TableHead>
+                    <TableHead>Fulfillment Status</TableHead>
+                    <TableHead>Registration Date</TableHead>
+                    <TableHead className="text-right">
+                      Individual Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {currentCustomers.length > 0 ? (
-                    currentCustomers.map((customer) => (
+                  {filteredAttendees.length > 0 ? (
+                    filteredAttendees.map((attendee) => (
                       <TableRow
-                        key={customer.email}
+                        key={attendee.purchaseId}
                         data-state={
-                          selectedRowKeys.includes(customer.email) && 'selected'
+                          selectedRowKeys.includes(attendee.purchaseId) &&
+                          'selected'
                         }
                       >
-                        <TableCell>
+                        <TableCell className="pl-4">
                           <Checkbox
-                            checked={selectedRowKeys.includes(customer.email)}
+                            checked={selectedRowKeys.includes(
+                              attendee.purchaseId
+                            )}
                             onCheckedChange={(checked) =>
-                              handleRowSelect(customer.email, checked)
+                              handleRowSelect(attendee.purchaseId, checked)
                             }
-                            aria-label={`Select ${customer.name}`}
+                            aria-label={`Select ${attendee.customerName}`}
                           />
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarImage
-                                src={customer.avatar}
-                                alt={customer.name}
-                              />
-                              <AvatarFallback>
-                                {customer.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{customer.name}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {customer.email}
-                              </div>
+                          <div>
+                            <div className="font-medium">
+                              {attendee.customerName}
+                            </div>
+                            <div className="text-sm uppercase text-muted-foreground">
+                              {attendee.customerEmail}
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium">
-                            {customer.lastPurchaseEvent}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {new Date(
-                              customer.lastPurchaseDate
-                            ).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })}
-                          </div>
+                          <Badge variant="outline" className="font-medium">
+                            <Ticket className="mr-2 h-4 w-4" />
+                            {attendee.ticketType}
+                          </Badge>
                         </TableCell>
-                        <TableCell className="text-right font-medium">
-                          $
-                          {customer.totalSpent.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                          })}
+                        <TableCell>
+                          <Badge
+                            variant="secondary"
+                            className={cn(
+                              'border-transparent font-semibold',
+                              attendee.checkedIn
+                                ? 'bg-success/20 text-success hover:bg-success/30'
+                                : 'bg-accent/20 text-accent hover:bg-accent/30'
+                            )}
+                          >
+                            {attendee.checkedIn ? (
+                              <CheckCircle2 className="mr-2 h-4 w-4" />
+                            ) : (
+                              <Clock className="mr-2 h-4 w-4" />
+                            )}
+                            {attendee.checkedIn ? 'Confirmed' : 'Pending'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(attendee.purchaseDate).toLocaleDateString(
+                            'en-CA'
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>View Details</DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Resend Confirmation
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-destructive">
+                                Cancel Order
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} className="h-24 text-center">
-                        No customers found.
+                      <TableCell colSpan={6} className="h-24 text-center">
+                        No attendees found.
                       </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
             </div>
-            {totalPages > 1 && (
-              <div className="flex items-center justify-end space-x-2 pt-4">
-                <span className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Bulk Action Bar */}
+      <div
+        className={cn(
+          'fixed bottom-4 right-1/2 z-50 translate-x-1/2 transform transition-all duration-300',
+          selectedRowKeys.length > 0
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-24 opacity-0'
+        )}
+      >
+        <Card className="flex items-center gap-4 p-3 shadow-2xl">
+          <div className="text-sm font-semibold">
+            {selectedRowKeys.length} selected
+          </div>
+          <Separator orientation="vertical" className="h-6" />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={handleSendEmail}>
+              <Mail className="mr-2 h-4 w-4" /> Email
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleExportSelected}>
+              <Download className="mr-2 h-4 w-4" /> Export
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Delete
+            </Button>
+          </div>
+        </Card>
+      </div>
+
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
@@ -412,7 +412,7 @@ export default function BulkActionsPage() {
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
-              selected {selectedRowKeys.length} customer(s) from the list.
+              selected {selectedRowKeys.length} attendee(s) from the list.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
