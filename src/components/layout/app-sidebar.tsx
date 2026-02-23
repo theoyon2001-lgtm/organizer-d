@@ -95,7 +95,16 @@ const navItems: (
     ],
   },
   { href: '/promotions', icon: TicketPercent, label: 'Promotions' },
-  { href: '/reports', icon: BarChart3, label: 'Reports' },
+  {
+    href: '/reports',
+    icon: BarChart3,
+    label: 'Reports',
+    subItems: [
+      { href: '/reports/daily-sales', label: 'Daily Sales' },
+      { href: '/reports/ticket-type-sales', label: 'Ticket Type Sales' },
+      { href: '/reports/attendance-report', label: 'Attendance Report' },
+    ],
+  },
 ];
 
 export default function AppSidebar() {
