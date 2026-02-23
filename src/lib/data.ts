@@ -1,4 +1,4 @@
-import type { Event, Sale, Revenue, Payout } from './types';
+import type { Event, Sale, Revenue, Payout, Commission, CommissionChartData } from './types';
 
 export const upcomingEvents: Event[] = [
   {
@@ -172,4 +172,24 @@ export const payoutHistory: Payout[] = [
     method: 'Bank Transfer',
     status: 'Failed',
   },
+];
+
+export const commissionHistory: Commission[] = [
+  { orderId: 'ORD5894', eventName: 'Summer Music Festival', date: '2024-07-10', grossSale: 150, commission: 15, netEarning: 135 },
+  { orderId: 'ORD5895', eventName: 'Tech Conference 2024', date: '2024-07-11', grossSale: 499, commission: 49.9, netEarning: 449.1 },
+  { orderId: 'ORD5896', eventName: 'Summer Music Festival', date: '2024-07-11', grossSale: 75, commission: 7.5, netEarning: 67.5 },
+  { orderId: 'ORD5897', eventName: 'Art & Wine Fair', date: '2024-07-12', grossSale: 240, commission: 24, netEarning: 216 },
+  { orderId: 'ORD5898', eventName: 'Tech Conference 2024', date: '2024-07-13', grossSale: 998, commission: 99.8, netEarning: 898.2 },
+  { orderId: 'ORD5899', eventName: 'Indie Film Showcase', date: '2024-07-14', grossSale: 50, commission: 5, netEarning: 45 },
+  { orderId: 'ORD5900', eventName: 'Summer Music Festival', date: '2024-07-15', grossSale: 225, commission: 22.5, netEarning: 202.5 },
+];
+
+export const commissionChartData: CommissionChartData[] = [
+  { month: 'Jan', revenue: 6500, commission: 650 },
+  { month: 'Feb', revenue: 5900, commission: 590 },
+  { month: 'Mar', revenue: 8000, commission: 800 },
+  { month: 'Apr', revenue: 8100, commission: 810 },
+  { month: 'May', revenue: 5600, commission: 560 },
+  { month: 'Jun', revenue: 7200, commission: 720 },
+  { month: 'Jul', revenue: 7850, commission: 785 },
 ];

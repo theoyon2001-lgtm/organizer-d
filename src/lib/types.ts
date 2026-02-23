@@ -35,3 +35,18 @@ export type Payout = {
   method: string;
   status: 'Completed' | 'Pending' | 'Failed';
 };
+
+export type Commission = {
+  orderId: string;
+  eventName: string;
+  date: string;
+  grossSale: number;
+  commission: number;
+  netEarning: number;
+};
+
+export type CommissionChartData = {
+  month: string;
+  revenue: number;
+  commission: number;
+};
