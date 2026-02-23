@@ -1,4 +1,4 @@
-import type { Event, Sale } from './types';
+import type { Event, Sale, Revenue, Payout } from './types';
 
 export const upcomingEvents: Event[] = [
   {
@@ -112,4 +112,64 @@ export const salesData: Sale[] = [
   { month: 'May', sales: 6000 },
   { month: 'Jun', sales: 5500 },
   { month: 'Jul', sales: 7000 },
+];
+
+export const revenueData: Revenue[] = [
+  { month: 'Jan', revenue: 6500 },
+  { month: 'Feb', revenue: 5900 },
+  { month: 'Mar', revenue: 8000 },
+  { month: 'Apr', revenue: 8100 },
+  { month: 'May', revenue: 5600 },
+  { month: 'Jun', revenue: 7200 },
+  { month: 'Jul', revenue: 7850 },
+  { month: 'Aug', revenue: 6800 },
+  { month: 'Sep', revenue: 9000 },
+  { month: 'Oct', revenue: 9500 },
+  { month: 'Nov', revenue: 7300 },
+  { month: 'Dec', revenue: 10200 },
+];
+
+export const payoutHistory: Payout[] = [
+  {
+    id: 'payout-1',
+    date: '2024-07-01',
+    amount: 5200.0,
+    method: 'Bank Transfer',
+    status: 'Completed',
+  },
+  {
+    id: 'payout-2',
+    date: '2024-06-15',
+    amount: 4800.0,
+    method: 'PayPal',
+    status: 'Completed',
+  },
+  {
+    id: 'payout-3',
+    date: '2024-06-01',
+    amount: 7500.5,
+    method: 'Bank Transfer',
+    status: 'Completed',
+  },
+  {
+    id: 'payout-4',
+    date: '2024-05-15',
+    amount: 3200.0,
+    method: 'Bank Transfer',
+    status: 'Completed',
+  },
+  {
+    id: 'payout-5',
+    date: '2024-05-01',
+    amount: 6100.25,
+    method: 'PayPal',
+    status: 'Completed',
+  },
+  {
+    id: 'payout-6',
+    date: '2024-04-15',
+    amount: 2500.0,
+    method: 'Bank Transfer',
+    status: 'Failed',
+  },
 ];

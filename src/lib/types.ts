@@ -27,3 +27,11 @@ export type Order = {
   amount: number;
   status: 'Paid' | 'Refunded' | 'Pending';
 };
+
+export type Payout = {
+  id: string;
+  date: string;
+  amount: number;
+  method: string;
+  status: 'Completed' | 'Pending' | 'Failed';
+};
