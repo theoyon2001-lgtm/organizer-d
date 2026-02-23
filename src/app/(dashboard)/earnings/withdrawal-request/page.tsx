@@ -24,7 +24,13 @@ import {
 } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Landmark, Smartphone, Wallet } from 'lucide-react';
+import {
+  ArrowLeft,
+  Landmark,
+  MessageSquare,
+  Smartphone,
+  Wallet,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import {
@@ -34,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 const availableForPayout = 10748.61;
 const mobileBankingMethods = ['bKash', 'Nagad', 'Rocket', 'Upay'] as const;
@@ -47,6 +54,7 @@ const formSchema = z
         availableForPayout,
         `Withdrawal amount cannot exceed available balance.`
       ),
+    note: z.string().optional(),
     payoutMethod: z.enum(['bank', 'mobile'], {
       required_error: 'You need to select a payout method.',
     }),
@@ -104,6 +112,7 @@ export default function WithdrawalRequestPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: 0,
+      note: '',
     },
   });
 
@@ -175,6 +184,27 @@ export default function WithdrawalRequestPage() {
                           placeholder="e.g., 500.00"
                           {...field}
                           className="pl-10"
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Note (Optional)</FormLabel>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-primary" />
+                      <FormControl>
+                        <Textarea
+                          placeholder="Add a note for your reference..."
+                          className="resize-none pl-10"
+                          {...field}
                         />
                       </FormControl>
                     </div>
