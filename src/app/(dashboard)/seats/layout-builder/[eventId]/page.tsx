@@ -284,11 +284,11 @@ export default function SeatLayoutEditorPage() {
                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label>Rows</Label>
-                            <Input type="number" value={activeSection.rows} onChange={e => updateSectionGrid(activeSection.id, Math.max(1, parseInt(e.target.value)), activeSection.cols)} min={1} />
+                            <Input type="number" value={activeSection.rows} onChange={e => updateSectionGrid(activeSection.id, Math.max(1, parseInt(e.target.value) || 1), activeSection.cols)} min={1} />
                         </div>
                         <div className="space-y-2">
                             <Label>Seats per row</Label>
-                            <Input type="number" value={activeSection.cols} onChange={e => updateSectionGrid(activeSection.id, activeSection.rows, Math.max(1, parseInt(e.target.value)))} min={1} />
+                            <Input type="number" value={activeSection.cols} onChange={e => updateSectionGrid(activeSection.id, activeSection.rows, Math.max(1, parseInt(e.target.value) || 1))} min={1} />
                         </div>
                      </div>
                 </div>
