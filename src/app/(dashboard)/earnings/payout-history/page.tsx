@@ -33,15 +33,89 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { payoutHistory as initialPayoutHistory } from '@/lib/data';
 import { Payout } from '@/lib/types';
-import { Separator } from '@/components/ui/separator';
+import Invoice from './invoice';
 
 const ITEMS_PER_PAGE = 8;
+
+// Component for the Dialog Content to allow usage of hooks
+const InvoiceDialogContent = ({ payout }: { payout: Payout }) => {
+  const invoiceRef = React.useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    const node = invoiceRef.current;
+    if (!node) return;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument;
+    if (!doc) {
+      document.body.removeChild(iframe);
+      return;
+    }
+
+    doc.write(`<html><head><title>Kicket-Receipt-${payout.id}</title>`);
+    const links = document.head.querySelectorAll('link');
+    links.forEach((link) => {
+      doc.write(link.outerHTML);
+    });
+
+    const styles = document.head.querySelectorAll('style');
+    styles.forEach((style) => {
+      doc.write(style.outerHTML);
+    });
+
+    doc.write('</head><body>');
+    doc.write(node.innerHTML);
+    doc.write('</body></html>');
+    doc.close();
+
+    // Use timeout to ensure styles are loaded before printing.
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      document.body.removeChild(iframe);
+    }, 500);
+  };
+
+  return (
+    <DialogContent className="max-w-4xl">
+      <DialogHeader>
+        <DialogTitle>Payout Receipt</DialogTitle>
+        <DialogDescription>
+          A detailed receipt for transaction ID: {payout.id}
+        </DialogDescription>
+      </DialogHeader>
+      <div className="my-4 max-h-[70vh] overflow-y-auto rounded-lg border bg-gray-50">
+        <Invoice ref={invoiceRef} payout={payout} />
+      </div>
+      <DialogFooter className="items-center sm:justify-between">
+        <p className="hidden text-sm text-muted-foreground sm:block">
+          You can save the receipt as a PDF from the print menu.
+        </p>
+        <div>
+          <DialogClose asChild>
+            <Button variant="outline">Close</Button>
+          </DialogClose>
+          <Button onClick={handlePrint} className="ml-2">
+            <Download className="mr-2 h-4 w-4" />
+            Print / Download
+          </Button>
+        </div>
+      </DialogFooter>
+    </DialogContent>
+  );
+};
 
 export default function PayoutHistoryPage() {
   const [payouts, setPayouts] = React.useState<Payout[]>(initialPayoutHistory);
@@ -206,97 +280,15 @@ export default function PayoutHistoryPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label="View Details"
-                              >
-                                <FileText className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Payout Details</DialogTitle>
-                                <DialogDescription>
-                                  Transaction ID: {payout.id}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4 py-4">
-                                <div className="flex justify-between">
-                                  <span className="text-muted-foreground">
-                                    Status
-                                  </span>
-                                  <Badge
-                                    variant={
-                                      payout.status === 'Completed'
-                                        ? 'default'
-                                        : payout.status === 'Pending'
-                                        ? 'secondary'
-                                        : 'destructive'
-                                    }
-                                    className="capitalize"
-                                  >
-                                    {payout.status}
-                                  </Badge>
-                                </div>
-                                <Separator />
-                                <div className="flex justify-between">
-                                  <span className="text-muted-foreground">
-                                    Date
-                                  </span>
-                                  <span className="font-medium">
-                                    {new Date(payout.date).toLocaleDateString(
-                                      'en-US',
-                                      {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: 'numeric',
-                                        minute: 'numeric',
-                                      }
-                                    )}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-muted-foreground">
-                                    Method
-                                  </span>
-                                  <span className="font-medium">
-                                    {payout.method}
-                                  </span>
-                                </div>
-                                <Separator />
-                                <div className="flex items-baseline justify-between">
-                                  <span className="text-muted-foreground">
-                                    Amount
-                                  </span>
-                                  <span className="text-2xl font-bold">
-                                    $
-                                    {payout.amount.toLocaleString('en-US', {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    })}
-                                  </span>
-                                </div>
-                              </div>
-                              <DialogFooter>
-                                <DialogClose asChild>
-                                  <Button variant="outline">Close</Button>
-                                </DialogClose>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label="Download Receipt"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <FileText className="mr-2 h-4 w-4" />
+                              View Receipt
+                            </Button>
+                          </DialogTrigger>
+                          <InvoiceDialogContent payout={payout} />
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))
