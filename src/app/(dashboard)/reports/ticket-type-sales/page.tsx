@@ -123,7 +123,7 @@ export default function TicketTypeSalesPage() {
         </div>
         <div className="flex items-center gap-2">
           <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-            <SelectTrigger className="w-[280px]">
+            <SelectTrigger className="w-[280px] border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 font-medium">
               <SelectValue placeholder="Filter by event" />
             </SelectTrigger>
             <SelectContent>
