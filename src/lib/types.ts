@@ -4,6 +4,7 @@ export type Event = {
   location: string;
   ticketsSold: number;
   totalTickets: number;
+  imageUrl?: string;
 };
 
 export type Sale = {
