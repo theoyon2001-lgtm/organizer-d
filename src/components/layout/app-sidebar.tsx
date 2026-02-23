@@ -83,7 +83,6 @@ const navItems: (
       { href: '/earnings/payout-history', label: 'Payout History' },
     ],
   },
-  { href: '/promotions', icon: TicketPercent, label: 'Promotions' },
   {
     href: '/reports',
     icon: BarChart3,
