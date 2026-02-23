@@ -35,6 +35,7 @@ import {
   DialogTitle,
   DialogClose,
   DialogFooter,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import { payoutHistory as initialPayoutHistory } from '@/lib/data';
 import { Payout } from '@/lib/types';
