@@ -41,6 +41,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation';
+import { Payout } from '@/lib/types';
 
 const availableForPayout = 10748.61;
 const mobileBankingMethods = ['bKash', 'Nagad', 'Rocket', 'Upay'] as const;
@@ -108,6 +110,7 @@ const formSchema = z
 
 export default function WithdrawalRequestPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -120,14 +123,34 @@ export default function WithdrawalRequestPage() {
   const watchedMobileMethod = form.watch('mobileMethod');
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const newPayout: Payout = {
+      id: `payout-${Date.now()}`,
+      date: new Date().toISOString(),
+      amount: values.amount,
+      method:
+        values.payoutMethod === 'bank'
+          ? 'Bank Transfer'
+          : values.mobileMethod || 'Mobile Banking',
+      status: 'Pending',
+    };
+
+    try {
+      const storedPayouts: Payout[] = JSON.parse(
+        localStorage.getItem('customPayouts') || '[]'
+      );
+      const updatedPayouts = [newPayout, ...storedPayouts];
+      localStorage.setItem('customPayouts', JSON.stringify(updatedPayouts));
+    } catch (error) {
+      console.error('Failed to save payout to localStorage', error);
+    }
+
     toast({
       title: 'Withdrawal Request Submitted',
       description: `Your request to withdraw $${values.amount.toFixed(
         2
       )} has been received.`,
     });
-    form.reset();
+    router.push('/earnings/payout-history');
   }
 
   return (

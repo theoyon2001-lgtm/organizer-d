@@ -24,7 +24,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { payoutHistory } from '@/lib/data';
+import { payoutHistory as initialPayoutHistory } from '@/lib/data';
 import { Payout } from '@/lib/types';
 import {
   DropdownMenu,
@@ -37,12 +37,24 @@ import {
 const ITEMS_PER_PAGE = 8;
 
 export default function PayoutHistoryPage() {
+  const [payouts, setPayouts] = React.useState<Payout[]>(initialPayoutHistory);
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const totalPages = Math.ceil(payoutHistory.length / ITEMS_PER_PAGE);
+  React.useEffect(() => {
+    const storedPayouts: Payout[] = JSON.parse(
+      localStorage.getItem('customPayouts') || '[]'
+    );
+    const combinedPayouts = [...storedPayouts, ...initialPayoutHistory];
+    const uniquePayouts = combinedPayouts.filter(
+      (payout, index, self) => index === self.findIndex((p) => p.id === payout.id)
+    );
+    setPayouts(uniquePayouts);
+  }, []);
+
+  const totalPages = Math.ceil(payouts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentPayouts = payoutHistory.slice(startIndex, endIndex);
+  const currentPayouts = payouts.slice(startIndex, endIndex);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
