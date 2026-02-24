@@ -182,8 +182,8 @@ export default function WithdrawalRequestPage() {
                     Specify the amount and select your payout method.
                   </CardDescription>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-right">
+                  <p className="text-sm font-medium text-primary">
                     Available Balance
                   </p>
                   <p className="text-2xl font-bold text-primary">
@@ -200,7 +200,7 @@ export default function WithdrawalRequestPage() {
                   <FormItem>
                     <FormLabel>Amount to Withdraw ($)</FormLabel>
                     <div className="relative">
-                      <Wallet className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+                      <Wallet className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-accent" />
                       <FormControl>
                         <Input
                           type="number"
@@ -222,7 +222,7 @@ export default function WithdrawalRequestPage() {
                   <FormItem>
                     <FormLabel>Note (Optional)</FormLabel>
                     <div className="relative">
-                      <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-primary" />
+                      <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-accent" />
                       <FormControl>
                         <Textarea
                           placeholder="Add a note for your reference..."
@@ -268,7 +268,7 @@ export default function WithdrawalRequestPage() {
                             htmlFor="bank"
                             className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-primary/5 hover:border-primary/20 hover:text-primary [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10 [&:has([data-state=checked])]:text-primary"
                           >
-                            <Landmark className="mb-3 h-6 w-6" />
+                            <Landmark className="mb-3 h-6 w-6 text-chart-4" />
                             Bank Transfer
                           </Label>
                         </FormItem>
@@ -284,7 +284,7 @@ export default function WithdrawalRequestPage() {
                             htmlFor="mobile"
                             className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 text-muted-foreground transition-colors hover:bg-primary/5 hover:border-primary/20 hover:text-primary [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10 [&:has([data-state=checked])]:text-primary"
                           >
-                            <Smartphone className="mb-3 h-6 w-6" />
+                            <Smartphone className="mb-3 h-6 w-6 text-chart-5" />
                             Mobile Banking
                           </Label>
                         </FormItem>
